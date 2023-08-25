@@ -1,0 +1,142 @@
+/PREP7
+/COM, ########## PROGRAM INIT ##########
+*DIM, FunctionsFolder, STRING, 100
+*SET, FunctionsFolder(1), 'C:\working\Ansys_projects\AveragingDamage\'
+/nerr, 0
+
+!specifying constants	##############################
+*SET, total_dead_nodes, 0
+*SET, total_dead_nodes_n, 0							!#
+*SET, total_dead_nodes_t, 0							!#
+*SET, N, 0											!#
+*SET, psi_start, 1e-8								!#
+*SET, max_acceptable_psi, 0.99 !0.99999				!#
+*SET, max_acceptable_group_psi, 0.5
+*SET, psi_stretch, 0.2								!#
+*SET, psi_twist, 0.95
+*SET, E_Fin, 0.1
+*SET, line_a, (E_Fin*psi_twist + psi_stretch*psi_twist - 1) / (psi_twist - 1)
+*SET, line_b, (1 - psi_stretch*psi_twist - E_Fin) / (psi_twist - 1)
+*SET, dislocationRadius, 2.1e-4
+*SET, dislocationKillThreshold, 0.5
+
+*SET, ResumePreviousCalculation, 'no'
+*SET, TotalSteps, 4000
+*SET, CalcRegime, 'TakeOff'
+*SET, DesiredBulkStressRatio, 0.25
+*SET, DoYouWantToNormalize, 0
+*SET, CalculateAngleToDeadNode, 0
+*SET, DoAverageOfDamage, 'yes'
+
+*SET, PlaneShift, 0
+*SET, XFrame, 0
+*SET, YFrame, 50e-3
+*SET, SidePlotType, 0
+*SET, TopPlotType, 1
+*SET, OneKillsOther, 0
+
+!*SET, default_EX, 1.15e11 !titanium
+*SET, default_EX, 207e9 !steel
+													!#
+*SET, gamma, 0.1									!#
+*SET, R, 0.0										!#			!#
+*SET, psi_power, 1.0								!#
+*SET, stepThreshold, 0.95							!#	if psi is above the value then node may go to die
+*SET, stepMultiplier, 0.5							!#	if psi below stepThreshold then step is multiplied by the value
+*SET, maxPsiToApply, 0.9							!#	when psi is above it the psi is cut down to this value
+*SET, Nmin, 1.0e4										!#							!#
+													!#
+*SET, betaVH, 0.3
+*SET, betaLH, 0.277
+												
+*SET, sigmaB, 1600e6
+*SET, sigmaU, 700e6
+*SET, sigmaUT, 400e6
+
+*SET, sigmaU0, 375e6								!#
+*SET, sigmaU0T, 300e6								!#
+*SET, dsigma, (sigmaB - sigmaU)*10**(-5*betaLH)		!#
+
+ESEL, S, ENAME, , 187
+*GET, numelem, ELEM,,COUNT
+*SET, lowestDravingElement, 1
+*SET, highestDravingElement, numelem
+*SET, centralDravingNode1, 194
+*SET, centralDravingNode2, centralDravingNode1
+allsel
+
+/INPUT, Init, mac, FunctionsFolder(1), , 1
+
+*IF, ResumePreviousCalculation, eq, 'yes', then
+	/INPUT, ReadFromTXT, mac, FunctionsFolder(1), , 1
+*ELSE
+	grand_cycle_No = 0
+*ENDIF
+
+*DO, GlobalStep, 1, TotalSteps, 1
+	InternalStep = 'Preparations'
+	
+	*IF, InternalStep, eq, 'Preparations', then
+		/INPUT, Preparations, mac, FunctionsFolder(1), , 1
+		InternalStep = 'Solver'
+	*ENDIF
+	
+	*IF, InternalStep, eq, 'Solver', then
+		/INPUT, Solver, mac, FunctionsFolder(1), , 1
+		InternalStep = 'StressCalculation'
+	*ENDIF
+	
+	*IF, InternalStep, eq, 'StressCalculation', then
+		/INPUT, StressCalculation, mac, FunctionsFolder(1), , 1
+		InternalStep = 'BCalculation'
+	*ENDIF
+	
+	*IF, InternalStep, eq, 'BCalculation', then
+		/INPUT, BCalculation, mac, FunctionsFolder(1), , 1		
+		InternalStep = 'DrawingImages'
+	*ENDIF
+	
+	*IF, InternalStep, eq, 'DrawingImages', then
+		*IF, MOD(GlobalStep,10), eq, 0, then
+			/INPUT, DrawingImages, mac, FunctionsFolder(1), , 1		
+		*ENDIF
+		InternalStep = 'CalculatingDamage'
+		!InternalStep = 'ExitHere'
+	*ENDIF
+	
+	*IF, InternalStep, eq, 'CalculatingDamage', then
+		/INPUT, CalculatingDamage, mac, FunctionsFolder(1), , 1		
+		InternalStep = 'LocateMaxPsi'
+	*ENDIF
+	
+	*IF, InternalStep, eq, 'LocateMaxPsi', then
+		/INPUT, LocateMaxPsi, mac, FunctionsFolder(1), , 1
+		*IF, DoAverageOfDamage, eq, 'yes', then
+			InternalStep = 'AveragingDamage'
+		*ELSE
+			InternalStep = 'ModifyElements'
+		*ENDIF
+	*ENDIF
+	
+	*IF, InternalStep, eq, 'AveragingDamage', then
+		/INPUT, AveragingDamage, mac, FunctionsFolder(1), , 1
+		InternalStep = 'ModifyElements'
+	*ENDIF
+	
+	*IF, InternalStep, eq, 'ModifyElements', then
+		/INPUT, ModifyElements, mac, FunctionsFolder(1), , 1
+		InternalStep = 'PrintingInfo'
+	*ENDIF
+	
+	*IF, InternalStep, eq, 'PrintingInfo', then
+		/INPUT, PrintingInfo, mac, FunctionsFolder(1), , 1			
+		InternalStep = 'WriteToTXT'
+	*ENDIF
+	
+	*IF, InternalStep, eq, 'WriteToTXT', then
+		/INPUT, WriteToTXT, mac, FunctionsFolder(1), , 1
+	*ENDIF
+*ENDDO
+
+FINISH
+/EOF

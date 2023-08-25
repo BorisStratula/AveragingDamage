@@ -1,0 +1,33 @@
+*DO, cn, 1, ntot
+	*IF, max_psi_n, lt, psi_n(cn), then																	!#
+		*SET, second_to_max_psi_n, max_psi_n															!#
+		*SET, max_psi_n, psi_n(cn)																		!#
+		*SET, max_psi_n_node, cn
+	*ENDIF																							!#
+	*IF, second_to_max_psi_n, lt, psi_n(cn), then														!#
+		*IF, psi_n(cn), lt, max_psi_n, then																!#
+			*SET, second_to_max_psi_n, psi_n(cn)														!#
+		*ENDIF																						!#
+	*ENDIF
+	
+	*IF, max_psi_t, lt, psi_t(cn), then																	!#
+		*SET, second_to_max_psi_t, max_psi_t															!#
+		*SET, max_psi_t, psi_t(cn)																		!#
+		*SET, max_psi_t_node, cn
+	*ENDIF																							!#
+	*IF, second_to_max_psi_t, lt, psi_t(cn), then														!#
+		*IF, psi_t(cn), lt, max_psi_t, then																!#
+			*SET, second_to_max_psi_t, psi_t(cn)														!#
+		*ENDIF																						!#
+	*ENDIF
+*ENDDO
+
+*IF, max_psi_n, ge, max_psi_t, then
+	max_psi_node = max_psi_n_node
+*ELSE
+	max_psi_node = max_psi_t_node
+*ENDIF
+
+max_psi_group = listOfGroups(max_psi_node)
+
+*STATUS, max_psi_node

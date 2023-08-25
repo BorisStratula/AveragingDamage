@@ -1,0 +1,81 @@
+/POST1
+
+ESEL, S, ELEM, , lowestDravingElement, highestDravingElement
+
+/GRAPHICS, POWER
+plot_distance = 3e-3
+/CPLANE, 1
+
+NWPAVE, centralDravingNode1
+/erase
+
+WPROTA, 0, 0, -45
+WPROTA, 0, 0, 0
+
+/window, 1, on
+/window, 2, off
+/window, 3, off
+/window, 4, off
+/TYPE, 1, 6
+/view, 1, wp
+/angle, 1, 0
+/vup, 1, -x
+/dist, 1, plot_distance
+/contour, 1, 9, -0.125, , 1
+/color, SMIN, DGRA
+/tlabel, -0.99, 0.92, psi
+*VPUT, psi_n(1), node, 1, u, y
+plnsol, u, y
+
+/window, 1, off
+/window, 2, on
+/TYPE, 2, 6
+/view, 2, wp
+/angle, 2, 0
+/vup, 2, -x
+/dist, 2, plot_distance
+/noerase
+!/contour, 2, 9, 1e2, , 
+!/color, SMIN, DGRA
+*VPUT, sigmaLH_n(1), node, 1, u, y
+plnsol, u, y
+
+!WPROTA, 0, 0, 0
+!WPROTA, 0, -180, 0
+
+
+NWPAVE, centralDravingNode2
+!plot_distance = 5e-3
+
+!WPROTA, 0, 180, 0
+!WPROTA, 0, 0, 0
+/window, 2, off
+/window, 3, on
+/TYPE, 3, 6
+/view, 3, wp
+/angle, 3, 0
+/vup, 3, -x
+/dist, 3, plot_distance
+/noerase
+/contour, 3, 9, -0.125, , 1
+/color, SMIN, DGRA
+*VPUT, psi_t(1), node, 1, u, y
+plnsol, u, y
+
+/window, 3, off
+/window, 4, on
+/TYPE, 4, 6
+/view, 4, wp
+/angle, 4, 0
+/vup, 4, -x
+/dist, 4, plot_distance
+/noerase
+!/contour, 4, 9, 1e2, , 
+!/color, SMIN, DGRA
+*VPUT, sigmaLH_t(1), node, 1, u, y
+plnsol, u, y
+WPROTA, 0, 0, 45
+WPROTA, 0, 0, 0
+
+allsel
+

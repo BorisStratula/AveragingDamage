@@ -1,0 +1,9 @@
+!/SOLU
+!SOLVE
+!
+!/EOF
+
+*IF, CalcRegime, eq, 'TakeOff', then
+	/SOLU
+	SOLVE
+*ENDIF

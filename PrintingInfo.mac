@@ -1,0 +1,35 @@
+/GOPR
+/COM, ########## debug info ########## !print variables	##
+grand_cycle_No = grand_cycle_No
+cycle_No = GlobalStep	
+max_psi_n = max_psi_n											!#
+second_to_max_psi_n = second_to_max_psi_n						!#
+max_psi_t = max_psi_t											!#
+second_to_max_psi_t = second_to_max_psi_t						!#
+nodes_to_kill_n = nodes_to_kill_n								!#
+nodes_to_kill_t = nodes_to_kill_t
+total_dead_nodes_n = total_dead_nodes_n			!#
+total_dead_nodes_t = total_dead_nodes_t			!#
+N = N														!#
+dN = dN														!#
+max_stress_n = max_stress_n										!#
+min_stress_n = min_stress_n										!#
+max_stress_t = max_stress_t										!#
+min_stress_t = min_stress_t
+may_die_n = may_die_n											!#
+may_die_t = may_die_t
+DeadNodeID = DeadNodeID
+max_psi_node = max_psi_node
+max_psi_group = max_psi_group
+amountOfAveragedGroups = amountOfAveragedGroups
+amountOfAveragedGroupsLeft = amountOfAveragedGroupsLeft
+psiOfTheFirstGroup = psiOfTheFirstGroup
+psi_n(203) =  psi_n(203) 
+psi_n(205) = psi_n(205)
+psi_n(206) = psi_n(206)
+listOfGroups(203) = listOfGroups(203)
+listOfGroups(205) = listOfGroups(205)
+listOfGroups(206) = listOfGroups(206)
+
+!#############################################################
+/NOPR

@@ -1,0 +1,90 @@
+/POST1
+
+*DO, cn, 1, ntot, 1
+!evaluating damage parameters ####################################################################################
+	*IF, psi_n(cn), ge, 0, then																						!#
+		*IF, sigmaVH_n(cn), lt, sigmaUT, then																			!#
+			B_n(cn) = 0																								!#
+		*ELSEIF, sigmaVH_n(cn), lt, (sigmaU + dsigma)																	!#
+			B_n(cn) = ((sigmaVH_n(cn) - sigmaUT) / (sigmaU + dsigma - sigmaUT))**(1 / betaVH)*1e-8 / 2 / (1 - gamma)	!#
+			may_die_n = may_die_n + 1																					!#
+			may_die_very_high = may_die_very_high + 1 																!#
+		*ELSEIF, sigmaLH_n(cn), lt, sigmaB																			!#
+			B_n(cn) = ((sigmaLH_n(cn) - sigmaU) / (sigmaB - sigmaU))**(1 / betaLH) / Nmin / 2 / (1 - gamma)				!#
+			may_die_n = may_die_n + 1																					!#
+			may_die_low_high = may_die_low_high + 1																	!#
+		*ELSE																										!#
+			B_n(cn) = 1 / 2 / Nmin / (1 - gamma)																		!#
+			may_die_n = may_die_n + 1																					!#
+			may_die_static = may_die_static + 1																		!#
+		*ENDIF																										!#
+	*ENDIF	!#########################################################################################################
+	!evaluating damage parameters ####################################################################################
+	*IF, psi_t(cn), ge, 0, then																						!#
+		*IF, sigmaVH_t(cn), lt, sigmaUT, then																			!#
+			B_t(cn) = 0																								!#
+		*ELSEIF, sigmaVH_t(cn), lt, (sigmaU + dsigma)																	!#
+			B_t(cn) = ((sigmaVH_t(cn) - sigmaUT) / (sigmaU + dsigma - sigmaUT))**(1 / betaVH)*1e-8 / 2 / (1 - gamma)	!#
+			may_die_t = may_die_t + 1																					!#
+			may_die_very_high = may_die_very_high + 1 																!#
+		*ELSEIF, sigmaLH_t(cn), lt, sigmaB																			!#
+			B_t(cn) = ((sigmaLH_t(cn) - sigmaU) / (sigmaB - sigmaU))**(1 / betaLH) / Nmin / 2 / (1 - gamma)				!#
+			may_die_t = may_die_t + 1																					!#
+			may_die_low_high = may_die_low_high + 1																	!#
+		*ELSE																										!#
+			B_t(cn) = 1 / 2 / Nmin / (1 - gamma)																		!#
+			may_die_t = may_die_t + 1																					!#
+			may_die_static = may_die_static + 1																		!#
+		*ENDIF																										!#
+	*ENDIF	!#########################################################################################################
+	
+	!evaluating number of cycles in step	##########################################################
+	*IF, B_n(cn), gt, 0, then																			!#
+		dN_total = 1 / (2*B_n(cn)*(1 - gamma))														!#
+		my_current_N = (2*psi_n(cn)**(1 - gamma) - psi_n(cn)**(2 - 2*gamma)) / (2*B_n(cn)*(1 - gamma))	!#
+		dN = dN_total - my_current_N																!#
+		*IF, dN, ge, 1e15, then																		!#
+			dN = 1e15																				!#
+		*ENDIF																						!#
+		*IF, psi_n(cn), le, stepThreshold, then														!#
+			! time step refinement, comment to turn off												!#
+			dN = dN*stepMultiplier																	!#
+		*ENDIF																						!#
+	*ELSE																							!#
+		dN_total = 1e15																				!#
+		dN = dN_total																				!#
+	*ENDIF	!#########################################################################################
+																				
+	*IF, min_dN, gt, dN, then
+		min_dN = dN
+		!min_dN_total = dN_total
+		!min_current_N = my_current_N
+	*ENDIF
+	!*IF, max_B, lt, B_n(cn), then
+	!	max_B = B_n(cn)
+	!*ENDIF
+	
+	!evaluating number of cycles in step	##########################################################
+	*IF, B_t(cn), gt, 0, then																			!#
+		dN_total = 1 / (2*B_t(cn)*(1 - gamma))														!#
+		my_current_N = (2*psi_t(cn)**(1 - gamma) - psi_t(cn)**(2 - 2*gamma)) / (2*B_t(cn)*(1 - gamma))	!#
+		dN = dN_total - my_current_N																!#
+		*IF, dN, ge, 1e15, then																		!#
+			dN = 1e15																				!#
+		*ENDIF																						!#
+		*IF, psi_t(cn), le, stepThreshold, then														!#
+			! time step refinement, comment to turn off												!#
+			dN = dN*stepMultiplier																	!#
+		*ENDIF																						!#
+	*ELSE																							!#
+		dN_total = 1e15																				!#
+		dN = dN_total																				!#
+	*ENDIF	!#########################################################################################
+																				
+	*IF, min_dN, gt, dN, then
+		min_dN = dN
+		!min_dN_total = dN_total
+		!min_current_N = my_current_N
+	*ENDIF
+*ENDDO
+dN = min_dN !set step to the shortest 

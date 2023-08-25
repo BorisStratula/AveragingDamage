@@ -1,0 +1,110 @@
+/PREP7 ! enter preprocessor to modify elements parameters
+!looking for max node number	##################################
+*DO, ce, 1, numelem												!#
+	*GET, work_node, ELEM, ce, NODE, 1							!#
+	*IF, work_node, gt, max_valid_node, then					!#
+		*SET, max_valid_node, work_node							!#
+	*ENDIF														!#
+	*GET, work_node, ELEM, ce, NODE, 2							!#
+	*IF, work_node, gt, max_valid_node, then					!#
+		*SET, max_valid_node, work_node							!#
+	*ENDIF														!#
+	*GET, work_node, ELEM, ce, NODE, 3							!#
+	*IF, work_node, gt, max_valid_node, then					!#
+		*SET, max_valid_node, work_node							!#
+	*ENDIF														!#
+	*GET, work_node, ELEM, ce, NODE, 4							!#
+	*IF, work_node, gt, max_valid_node, then					!#
+		*SET, max_valid_node, work_node							!#
+	*ENDIF														!#
+																!#
+	MP,DENS,ce,4500,	! kg m^-3
+	MP,ALPX,ce,9.4e-06,	! C^-1
+	MP,C,ce,522,	! J kg^-1 C^-1
+	MP,KXX,ce,21.9,	! W m^-1 C^-1
+	MP,RSVX,ce,1.7e-06,	! kg m^3 A^-2 s^-3
+	MP,EX,ce,default_EX,	! Pa
+	MP,NUXY,ce,0.37,
+	MP,MURX,ce,1,
+	MPCHG, ce, ce
+*ENDDO															!#
+ntot = max_valid_node											!#
+!#################################################################
+
+/prep7
+/GRAPHICS,POWER
+!/triad, off
+/triad, on
+/window, 1, ltop
+/window, 2, rtop
+/window, 3, lbot
+/window, 4, rbot
+NWPAVE, centralDravingNode1
+WPROTA, 0, 0, 0
+WPROTA, 0, 0, 0
+/CPLANE, 1
+/TYPE, 1, 6	
+/view, 1, wp
+/angle, 1, 0			
+/vup, 1, -x			
+/dist, 1, 1e-2	
+/dscale, all, 1e-20			
+/PLOPTS, MINM, 0			
+/gfile, 2400				
+/RGB,INDEX,100,100,100, 0	
+/RGB,INDEX, 80, 80, 80,13	
+/RGB,INDEX, 60, 60, 60,14	
+/RGB,INDEX, 0, 0, 0,15		
+/PSTATUS, 1					
+!/dist, all, 3e-2
+/window, 2, off
+/window, 3, off
+/window, 4, off
+/show,png					!#
+ESEL, S, ELEM, , lowestDravingElement, highestDravingElement
+eplot
+allsel
+/triad, on
+WPROTA, 0, 0, 0
+WPROTA, 0, 0, 0
+
+/GLINE, 1, -1
+/GLINE, 2, -1
+/GLINE, 3, -1
+/GLINE, 4, -1
+
+
+*DIM, psi_n, array, ntot ! creat an array for psi_n
+*DIM, psi_n_tilda, array, ntot
+*DIM, sigmaLH_n, array, ntot
+*DIM, sigmaVH_n, array, ntot
+*DIM, B_n, array, ntot
+*DIM, psi_t, array, ntot
+*DIM, psi_t_tilda, array, ntot
+*DIM, sigmaLH_t, array, ntot
+*DIM, sigmaVH_t, array, ntot
+*DIM, B_t, array, ntot
+*DIM, psi, array, ntot
+*DIM, listOfGroups, ARRAY, ntot
+*DIM, listOfCentralNodes, ARRAY, ntot
+
+*DO, cn, 1, ntot
+	*SET, psi_n(cn), psi_start ! set almost zeroes to the psi_n array
+	*SET, B_n(cn), 0
+	*SET, psi_t(cn), psi_start
+	*SET, B_t(cn), 0
+	*SET, psi(cn), psi_start
+	*SET, listOfGroups(cn), 0
+	*SET, listOfCentralNodes(cn), 0
+*ENDDO
+
+*SET, amountOfAveragedGroups, 0
+*SET, amountOfAveragedGroupsLeft, 0
+
+*DIM, DeltaY, array, 3
+
+*SET, AngleToDeadNode, 0
+
+NROPT,FULL
+
+NEQIT, 100

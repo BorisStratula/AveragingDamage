@@ -1,0 +1,109 @@
+!If the element with max PSI has no group, a new group is created for him
+
+*IF, max_psi_group, eq, 0, then
+	newCentralNode = max_psi_node
+	max_psi_group = newCentralNode
+	/INPUT, CreateNewGroup, mac, FunctionsFolder(1), , 1
+*ENDIF
+
+!Every iteration, an averaging process within every group is conducted
+
+psi_n_beforeAveraging = 0
+psi_n_afterAveraging = 0
+*DO, groupNumber, 1, amountOfAveragedGroups
+	*IF, listOfCentralNodes(groupNumber), eq, 0, then
+		*CYCLE
+	*ENDIF
+	centralNode = listOfCentralNodes(groupNumber)
+	*IF, psi_n(centralNode), lt, 0, then
+		*CYCLE
+	*ENDIF
+	
+	!! true way of averaging
+	!*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
+	!	currentNode = listOfFriends(centralNode, currentGroupMember)
+	!	psi_n_tilda(currentNode) = 0
+	!	psi_t_tilda(currentNode) = 0
+	!	
+	!	*DO, memberOfGroup, 2, listOfFriends(currentNode, 1) + 1
+	!		memberNumber = listOfFriends(currentNode, memberOfGroup)
+	!		*DO, iterator2, 2, listOfFriends(memberNumber, 1) + 1
+	!			*IF, listOfFriends(memberNumber, iterator2), eq, currentNode, then
+	!				revertAlphaD = listOfAlphaD(memberNumber, iterator2)
+	!				*EXIT
+	!			*ENDIF
+	!		*ENDDO
+	!		psi_n_tilda(currentNode) = psi_n_tilda(currentNode) + psi_n(listOfFriends(currentNode, memberOfGroup))*revertAlphaD
+	!		psi_t_tilda(currentNode) = psi_t_tilda(currentNode) + psi_t(listOfFriends(currentNode, memberOfGroup))*revertAlphaD
+	!	*ENDDO
+	!*ENDDO
+	!*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
+	!	currentNode = listOfFriends(centralNode, currentGroupMember)
+	!	psi_n(currentNode) = psi_n_tilda(currentNode)
+	!	psi_t(currentNode) = psi_t_tilda(currentNode)
+	!*ENDDO
+	
+	! simplified way
+	psi_n_sum = 0
+	psi_t_sum = 0
+	*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
+		currentNode = listOfFriends(centralNode, currentGroupMember)
+		psi_n_sum = psi_n_sum + psi_n(currentNode)
+		psi_t_sum = psi_t_sum + psi_t(currentNode)
+	*ENDDO
+	*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
+		currentNode = listOfFriends(centralNode, currentGroupMember)
+		psi_n(currentNode) = psi_n_sum/listOfFriends(centralNode, 1)
+		psi_t(currentNode) = psi_t_sum/listOfFriends(centralNode, 1)
+	*ENDDO
+*ENDDO
+
+!Updating the info on the max PSI value
+
+max_psi_n = 0					!#
+second_to_max_psi_n = 0		!#
+max_psi_t = 0
+second_to_max_psi_t = 0
+
+*DO, cn, 1, ntot
+	*IF, max_psi_n, lt, psi_n(cn), then																	!#
+		*SET, second_to_max_psi_n, max_psi_n															!#
+		*SET, max_psi_n, psi_n(cn)																		!#
+		*SET, max_psi_n_node, cn
+	*ENDIF																							!#
+	*IF, second_to_max_psi_n, lt, psi_n(cn), then														!#
+		*IF, psi_n(cn), lt, max_psi_n, then																!#
+			*SET, second_to_max_psi_n, psi_n(cn)														!#
+		*ENDIF																						!#
+	*ENDIF
+	
+	*IF, max_psi_t, lt, psi_t(cn), then																	!#
+		*SET, second_to_max_psi_t, max_psi_t															!#
+		*SET, max_psi_t, psi_t(cn)																		!#
+		*SET, max_psi_t_node, cn
+	*ENDIF																							!#
+	*IF, second_to_max_psi_t, lt, psi_t(cn), then														!#
+		*IF, psi_t(cn), lt, max_psi_t, then																!#
+			*SET, second_to_max_psi_t, psi_t(cn)														!#
+		*ENDIF																						!#
+	*ENDIF
+*ENDDO
+
+*IF, max_psi_n, ge, max_psi_t, then
+	max_psi = max_psi_n
+*ELSE
+	max_psi = max_psi_t
+*ENDIF
+
+*IF, max_psi_n, ge, max_psi_t, then
+	max_psi_node = max_psi_n_node
+*ELSE
+	max_psi_node = max_psi_t_node
+*ENDIF
+
+max_psi_group = listOfGroups(max_psi_node)
+
+psiOfTheFirstGroup = 0
+*DO, cn, 2, listOfFriends(listOfCentralNodes(1), 1) + 1
+	psiOfTheFirstGroup = psiOfTheFirstGroup + psi_n(listOfFriends(listOfCentralNodes(1), cn))
+*ENDDO

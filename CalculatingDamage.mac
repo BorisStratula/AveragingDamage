@@ -1,0 +1,97 @@
+/POST1
+
+*DO, cn, 1, ntot !cycle through all nodes and calculate damage		##################################
+	*IF, psi_n(cn), lt, 0, then																		!#
+		*CYCLE																						!#
+	*ENDIF																							!#
+	*IF, B_n(cn), ne, 0, then																			!#
+		my_current_N = (2*psi_n(cn)**(1 - gamma) - psi_n(cn)**(2 - 2*gamma)) / (2*B_n(cn)*(1 - gamma))	!#
+	*ELSE																							!#
+		my_current_N = 0																			!#
+	*ENDIF																							!#
+																									!#
+	next_N = dN + my_current_N																		!#
+	psi_root = 1 + 2*next_N*B_n(cn)*(gamma - 1)														!#
+	*IF, psi_root, lt, 0, then																		!#
+		psi_root = 0																				!#
+	*ENDIF																							!#
+	psi_temp = (1 - sqrt(psi_root))**(1 / (gamma - 1))												!#
+	*IF, psi_temp, gt, 0, then																		!#
+		*IF, B_n(cn), gt, 0, then																		!#
+			psi_n(cn) = 1 / psi_temp																	!#
+		*ELSE																						!#
+			psi_n(cn) = psi_n(cn)																		!#
+		*ENDIF																						!#
+	*ENDIF																							!#
+
+*ENDDO		!#########################################################################################
+
+*DO, cn, 1, ntot !cycle through all nodes and calculate damage		##################################
+	*IF, psi_t(cn), lt, 0, then																		!#
+		*CYCLE																						!#
+	*ENDIF																							!#
+	*IF, B_t(cn), ne, 0, then																			!#
+		my_current_N = (2*psi_t(cn)**(1 - gamma) - psi_t(cn)**(2 - 2*gamma)) / (2*B_t(cn)*(1 - gamma))	!#
+	*ELSE																							!#
+		my_current_N = 0																			!#
+	*ENDIF																							!#
+																									!#
+	next_N = dN + my_current_N																		!#
+	psi_root = 1 + 2*next_N*B_t(cn)*(gamma - 1)														!#
+	*IF, psi_root, lt, 0, then																		!#
+		psi_root = 0																				!#
+	*ENDIF																							!#
+	psi_temp = (1 - sqrt(psi_root))**(1 / (gamma - 1))												!#
+	*IF, psi_temp, gt, 0, then																		!#
+		*IF, B_t(cn), gt, 0, then																		!#
+			psi_t(cn) = 1 / psi_temp																	!#
+		*ELSE																						!#
+			psi_t(cn) = psi_t(cn)																		!#
+		*ENDIF																						!#
+	*ENDIF																							!#
+
+*ENDDO		!#########################################################################################
+																									
+*IF, (may_die_n + may_die_t), eq, 0, then																			
+	*SET, dN, 0																						
+*ENDIF
+
+! Function to autorotate image
+*IF, CalculateAngleToDeadNode, eq, 1, then
+	*IF, (nodes_to_kill_n + nodes_to_kill_t), eq, 1, then
+		CalculateAngleToDeadNode = 0
+		*GET, NodeX, NODE, DeadNodeID, LOC, X
+		*GET, NodeY, NODE, DeadNodeID, LOC, Y
+		*GET, NodeZ, NODE, DeadNodeID, LOC, Z
+		!AngleToDeadNode = 90 - ATAN2(NodeZ, NodeX)*180/3.14159265359
+		AngleToDeadNode = 90*(1 - SidePlotType) - ATAN2(NodeZ, NodeX)*180/3.14159265359
+		!AngleToDeadNode = -45
+		PlaneShift = NodeY - YFrame/2 !3.25e-2
+	*ENDIF
+*ENDIF
+
+*IF, CalculateAngleToDeadNode, gt, 1, then
+	*IF, (nodes_to_kill_n + nodes_to_kill_t), eq, 1, then
+		CalculateAngleToDeadNode = CalculateAngleToDeadNode - 1
+	*ENDIF
+*ENDIF
+
+N = N + dN
+
+!*SET, OneKillsOther, 1
+
+*IF, OneKillsOther, eq, 1, then
+	*DO, cn, 1, ntot
+		*IF, psi_t(cn), ge, 0.1, then
+			*IF, psi_t(cn), ge, psi_n(cn), then
+				psi_n(cn) = psi_start
+			*ENDIF
+		*ENDIF
+		*IF, psi_n(cn), ge, 0.1, then
+			*IF, psi_n(cn), ge, psi_t(cn), then
+				psi_t(cn) = psi_start
+			*ENDIF
+		*ENDIF
+	*ENDDO
+*ENDIF
+	

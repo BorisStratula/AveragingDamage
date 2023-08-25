@@ -1,0 +1,86 @@
+/PREP7
+
+/COM, ########## reading from txt ##########
+
+*DIM, Dumb_Array, ARRAY, 11
+*VREAD, Dumb_Array(1), Restart_Values, txt,,
+(1G40.20)
+
+N = Dumb_Array(1)
+grand_cycle_No = Dumb_Array(2)
+total_dead_nodes_n = Dumb_Array(3)
+total_dead_nodes_t = Dumb_Array(4)
+UYDesired = Dumb_Array(5)
+DeadNodeID = Dumb_Array(6)
+NodeX = Dumb_Array(7)
+NodeY = Dumb_Array(8)
+NodeZ = Dumb_Array(9)
+AngleToDeadNode = Dumb_Array(10)
+PlaneShift = Dumb_Array(11)
+
+*DIM, Dumb_Array, ARRAY, ntot
+*VREAD, Dumb_Array(1), Restart_psi_n, txt,,
+(1G40.20)
+
+*DO, cn, 1, ntot
+	psi_n(cn) = Dumb_Array(cn)
+*ENDDO
+
+*DIM, Dumb_Array, ARRAY, ntot
+*VREAD, Dumb_Array(1), Restart_psi_t, txt,,
+(1G40.20)
+
+*DO, cn, 1, ntot
+	psi_t(cn) = Dumb_Array(cn)
+*ENDDO
+
+
+
+!*GET, numelem, ELEM,,COUNT															!#
+*DO, ce, 1, numelem																	!#
+	local_max_psi = 0																!#
+	*DO, i, 1, 4																	!#
+		*GET, node_num, ELEM, ce, NODE, i											!#
+		*IF, psi_n(node_num), ge, psi_t(node_num), then
+			psi(node_num) = psi_n(node_num)
+		*ELSE
+			psi(node_num) = psi_t(node_num)
+		*ENDIF
+		*IF, psi(node_num), gt, local_max_psi, then									!#
+			local_max_psi = psi(node_num)											!#
+		*ENDIF																		!#
+	*ENDDO																			!#
+	! part about stretching psi_n to the right #################################		!#
+	MP, EX, ce, default_EX*(1 - psi_stretch*(local_max_psi)**psi_power)	!#		!#	
+*ENDDO		!#########################################################################
+
+*IF, AddInclusion, eq, 1, then
+	MP, EX, closest_element, InclusionEX
+*ENDIF
+
+/COM, ########## selecting nodes to kill ##########
+
+*DO, ce, 1, numelem
+	KillThisElement = 0
+	*DO, i, 1, 4
+		*GET, node_num, ELEM, ce, NODE, i
+		*IF, psi(node_num), gt, max_acceptable_psi, then
+			KillThisElement = 1
+		*ENDIF
+		*IF, psi_n(node_num), eq, -1, then
+			KillThisElement = 1
+		*ENDIF
+	*ENDDO
+	*IF, KillThisElement, eq, 1, then
+		EKILL, ce
+	*ENDIF
+*ENDDO
+
+*DO, cn, 1, ntot
+	*IF, psi(cn), ge, max_acceptable_psi, then
+		*SET, psi_n(cn), -1
+		*SET, psi_t(cn), -1
+	*ENDIF
+*ENDDO
+
+allsel

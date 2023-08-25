@@ -1,0 +1,96 @@
+*DIM, testArray, ARRAY, 3, 3
+testArray(1,1) = 3.14
+*STATUS, testArray
+
+/nerr, 0
+
+ESEL, S, ENAME, , 187
+*GET, numelem, ELEM,,COUNT
+
+*SET, default_EX, 207e9 !steel
+/PREP7 ! enter preprocessor to modify elements parameters
+!looking for max node number	##################################
+*DO, ce, 1, numelem												!#
+	*GET, work_node, ELEM, ce, NODE, 1							!#
+	*IF, work_node, gt, max_valid_node, then					!#
+		*SET, max_valid_node, work_node							!#
+	*ENDIF														!#
+	*GET, work_node, ELEM, ce, NODE, 2							!#
+	*IF, work_node, gt, max_valid_node, then					!#
+		*SET, max_valid_node, work_node							!#
+	*ENDIF														!#
+	*GET, work_node, ELEM, ce, NODE, 3							!#
+	*IF, work_node, gt, max_valid_node, then					!#
+		*SET, max_valid_node, work_node							!#
+	*ENDIF														!#
+	*GET, work_node, ELEM, ce, NODE, 4							!#
+	*IF, work_node, gt, max_valid_node, then					!#
+		*SET, max_valid_node, work_node							!#
+	*ENDIF														!#
+																!#
+	MP,DENS,ce,4500,	! kg m^-3
+	MP,ALPX,ce,9.4e-06,	! C^-1
+	MP,C,ce,522,	! J kg^-1 C^-1
+	MP,KXX,ce,21.9,	! W m^-1 C^-1
+	MP,RSVX,ce,1.7e-06,	! kg m^3 A^-2 s^-3
+	MP,EX,ce,default_EX,	! Pa
+	MP,NUXY,ce,0.37,
+	MP,MURX,ce,1,
+	MPCHG, ce, ce
+*ENDDO															!#
+ntot = max_valid_node											!#
+!#################################################################
+/SOLU
+
+friendDistance = 2.5e-4
+maxNumberOfFriends = 0
+
+*DO, cn, 1, ntot
+	*GET, myX, NODE, cn, LOC, X
+	*GET, myY, NODE, cn, LOC, Y
+	*GET, myZ, NODE, cn, LOC, Z
+	numberOfFriends = 0
+	*DO, possibleFriend, 1, ntot
+		*GET, hisX, NODE, possibleFriend, LOC, X
+		*GET, hisY, NODE, possibleFriend, LOC, Y
+		*GET, hisZ, NODE, possibleFriend, LOC, Z
+		distance = sqrt((hisX - myX)**2 + (hisY - myY)**2 + (hisZ - myZ)**2)
+		*IF, distance, lt, friendDistance, then
+			numberOfFriends = numberOfFriends + 1
+		*ENDIF
+	*ENDDO
+	*IF, numberOfFriends, gt, maxNumberOfFriends, then
+		maxNumberOfFriends = numberOfFriends
+	*ENDIF
+*ENDDO
+
+maxNumberOfFriends = maxNumberOfFriends
+listOfFriendsMemory = ntot*maxNumberOfFriends*16/1024/1024
+*IF, listOfFriendsMemory, gt, (20*1024), then
+	/COM, Too much memory required
+	/eof
+*ENDIF
+*DIM, listOfFriends, ARRAY, ntot, (maxNumberOfFriends + 1)
+
+*DO, cn, 1, ntot
+	*GET, myX, NODE, cn, LOC, X
+	*GET, myY, NODE, cn, LOC, Y
+	*GET, myZ, NODE, cn, LOC, Z
+	numberOfFriends = 0
+	*DO, possibleFriend, 1, ntot
+		*GET, hisX, NODE, possibleFriend, LOC, X
+		*GET, hisY, NODE, possibleFriend, LOC, Y
+		*GET, hisZ, NODE, possibleFriend, LOC, Z
+		distance = sqrt((hisX - myX)**2 + (hisY - myY)**2 + (hisZ - myZ)**2)
+		*IF, distance, le, friendDistance, then
+			numberOfFriends = numberOfFriends + 1
+			listOfFriends(cn, numberOfFriends + 1) = possibleFriend
+		*ENDIF
+	*ENDDO
+	listOfFriends(cn, 1) = numberOfFriends
+*ENDDO
+
+*STATUS, listOfFriends, 199, 199
+
+/COM, ### THE END ###
+

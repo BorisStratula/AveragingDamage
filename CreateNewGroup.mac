@@ -1,0 +1,113 @@
+
+!Array initiation
+
+*IF, GlobalStep, eq, 1, then
+	*GET, myX, NODE, newCentralNode, LOC, X
+	*GET, myY, NODE, newCentralNode, LOC, Y
+	*GET, myZ, NODE, newCentralNode, LOC, Z
+	numberOfFriends = 0
+	*DO, possibleFriend, 1, ntot
+		*GET, hisX, NODE, possibleFriend, LOC, X
+		*GET, hisY, NODE, possibleFriend, LOC, Y
+		*GET, hisZ, NODE, possibleFriend, LOC, Z
+		distance = sqrt((hisX - myX)**2 + (hisY - myY)**2 + (hisZ - myZ)**2)
+		*IF, distance, lt, dislocationRadius, then
+			numberOfFriends = numberOfFriends + 1
+		*ENDIF
+	*ENDDO
+
+	maxNumberOfFriends = numberOfFriends*3
+	maxNumberOfFriends = maxNumberOfFriends
+	memoryForListOfFriends = ntot*maxNumberOfFriends*16/1024/1024
+	memoryForListOfAlphaInf = memoryForListOfFriends
+	memoryForListOfAlphaD = memoryForListOfFriends
+	memoryForAllLists = memoryForListOfFriends + memoryForListOfAlphaInf + memoryForListOfAlphaD
+	*IF, memoryForAllLists, gt, (20*1024), then
+		/COM, Too much memory required
+		/EXIT, NOSAVE
+	*ENDIF
+	*DIM, listOfFriends, ARRAY, ntot, (maxNumberOfFriends + 1)
+	*DIM, listOfAlphaInf, ARRAY, ntot, (maxNumberOfFriends + 1)
+	*DIM, listOfAlphaD , ARRAY, ntot, (maxNumberOfFriends + 1)
+	
+	*DO, cn, 1, ntot
+		listOfGroups(cn) = 0
+	*ENDDO
+*ENDIF
+
+! Working with the central node of a group
+
+*GET, myX, NODE, newCentralNode, LOC, X
+*GET, myY, NODE, newCentralNode, LOC, Y
+*GET, myZ, NODE, newCentralNode, LOC, Z
+numberOfFriends = 0
+alphaIntegral = 0
+*DO, possibleFriend, 1, ntot
+	*IF, listOfGroups(possibleFriend), ne, 0, then
+		*CYCLE
+	*ENDIF
+	*GET, hisX, NODE, possibleFriend, LOC, X
+	*GET, hisY, NODE, possibleFriend, LOC, Y
+	*GET, hisZ, NODE, possibleFriend, LOC, Z
+	distance = sqrt((hisX - myX)**2 + (hisY - myY)**2 + (hisZ - myZ)**2)
+	*IF, distance, le, dislocationRadius, then
+		numberOfFriends = numberOfFriends + 1
+		listOfFriends(newCentralNode, numberOfFriends + 1) = possibleFriend
+		rij = distance/dislocationRadius
+		listOfAlphaInf(newCentralNode, numberOfFriends + 1) = (1 - rij**4)**2
+		!listOfAlphaInf(newCentralNode, numberOfFriends + 1) = 1
+		alphaIntegral = alphaIntegral + listOfAlphaInf(newCentralNode, numberOfFriends + 1)
+		listOfGroups(possibleFriend) = newCentralNode
+	*ENDIF
+*ENDDO
+listOfFriends(newCentralNode, 1) = numberOfFriends
+listOfAlphaInf(newCentralNode, 1) = numberOfFriends
+*DO, friendNumber, 2, listOfFriends(newCentralNode, 1) + 1
+	listOfAlphaD(newCentralNode, friendNumber) = listOfAlphaInf(newCentralNode, friendNumber)/alphaIntegral
+*ENDDO
+listOfAlphaD(newCentralNode, 1) = numberOfFriends
+amountOfAveragedGroups = amountOfAveragedGroups + 1
+amountOfAveragedGroupsLeft = amountOfAveragedGroupsLeft + 1
+listOfCentralNodes(amountOfAveragedGroups) = newCentralNode
+
+! Working with the rest of the members of the group
+
+*DO, currentGroupMember, 2, listOfFriends(newCentralNode, 1) + 1
+	currentNode = listOfFriends(newCentralNode, currentGroupMember)
+	*IF, currentNode, eq, newCentralNode, then
+		*CYCLE
+	*ENDIF
+	*GET, myX, NODE, currentNode, LOC, X
+	*GET, myY, NODE, currentNode, LOC, Y
+	*GET, myZ, NODE, currentNode, LOC, Z
+	numberOfFriends = 0
+	alphaIntegral = 0
+	*DO, memberOfGroup, 2, listOfFriends(newCentralNode, 1) + 1
+		memberNode = listOfFriends(newCentralNode, memberOfGroup)
+		*GET, hisX, NODE, memberNode, LOC, X
+		*GET, hisY, NODE, memberNode, LOC, Y
+		*GET, hisZ, NODE, memberNode, LOC, Z
+		distance = sqrt((hisX - myX)**2 + (hisY - myY)**2 + (hisZ - myZ)**2)
+		*IF, distance, le, dislocationRadius, then
+			numberOfFriends = numberOfFriends + 1
+			listOfFriends(currentNode, numberOfFriends + 1) = memberNode
+			rij = distance/dislocationRadius
+			listOfAlphaInf(currentNode, numberOfFriends + 1) = (1 - rij**4)**2
+			!listOfAlphaInf(currentNode, numberOfFriends + 1) = 1
+			alphaIntegral = alphaIntegral + listOfAlphaInf(currentNode, numberOfFriends + 1)
+		*ENDIF
+	*ENDDO
+	listOfFriends(currentNode, 1) = numberOfFriends
+	listOfAlphaInf(currentNode, 1) = numberOfFriends
+	*DO, memberOfGroup, 2, listOfFriends(currentNode, 1) + 1
+		listOfAlphaD(currentNode, memberOfGroup) = listOfAlphaInf(currentNode, memberOfGroup)/alphaIntegral
+	*ENDDO
+	listOfAlphaD(currentNode, 1) = numberOfFriends
+*ENDDO
+
+*IF, GlobalStep, eq, 1, then
+	*STATUS, listOfFriends, newCentralNode, newCentralNode
+	*STATUS, listOfAlphaInf, newCentralNode, newCentralNode
+	*STATUS, listOfAlphaD, newCentralNode, newCentralNode
+	*STATUS, listOfAlphaD, 196, 196
+*ENDIF

@@ -1,0 +1,78 @@
+/POST1
+set, LAST
+
+
+*GET, UYMax, node, 475, U, SUM
+*IF, grand_cycle_No, eq, 1, then
+	UYDesired = UYMax
+	UYRelax = UYDesired / UYMax
+*ELSE
+	UYRelax = UYDesired / UYMax
+*ENDIF
+
+
+*IF, CalcRegime, eq, 'TakeOff', then
+	*DO, cn, 1, ntot, 1 ! go through the all node
+		*SET, sigmaLH_n(cn), 0
+		*SET, sigmaVH_n(cn), 0
+		*SET, sigmaLH_t(cn), 0
+		*SET, sigmaVH_t(cn), 0
+		
+		*IF, psi(cn), lt, 0, then
+			B_n(cn) = 0
+			B_t(cn) = 0
+			*CYCLE
+		*ENDIF
+		
+		!SWT criterion	######################################
+		*GET, sigma1max, node, cn, S, 1						!#
+		*GET, sigma2max, node, cn, S, 2						!#
+		*GET, sigma3max, node, cn, S, 3						!#
+		*IF, sigma1max, lt, 0, then							!#
+			sigma1max = 0									!#
+		*ENDIF												!#
+		*IF, sigma2max, lt, 0, then							!#
+			sigma2max = 0									!#
+		*ENDIF												!#
+		*IF, sigma3max, lt, 0, then							!#
+			sigma3max = 0									!#
+		*ENDIF												!#
+		dsigma1 = sigma1max*(1 - R)							!#
+		*SET, sigmaLH_n(cn), sqrt(sigma1max*dsigma1 / 2)*UYRelax		!#
+		*SET, sigmaVH_n(cn), sigmaLH_n(cn)						!#
+		!SWT criterion end	##################################
+		
+		!CSV Boris criterion	!#############################################
+		*GET, sigma1max, node, cn, S, 1										!#
+		*GET, sigma2max, node, cn, S, 2										!#
+		*GET, sigma3max, node, cn, S, 3
+		dsigma1 = sigma1max*(1 - R)											!#
+		dsigma2 = sigma2max*(1 - R)											!#
+		dsigma3 = sigma3max*(1 - R)
+		dsigmaN = (dsigma1 + dsigma3) / 2									!#
+		dsigmaTau = (dsigma1 - dsigma3) / 2									!#
+		*SET, sigmaLH_t(cn), sqrt((dsigmaN / 2)**2 + 3*(dsigmaTau / 2)**2)*UYRelax	!#
+		*SET, sigmaVH_t(cn), sigmaLH_t(cn)
+		!CSV criterion end	!#################################################
+		!*SET, sigmaLH_t(cn), 0 !zeroing tangential components, if not uncomment previous 2 lines
+		!*SET, sigmaVH_t(cn), 0 !zeroing tangential components, if not uncomment previous 2 lines
+		
+		*IF, sigmaLH_n(cn), gt, max_stress_n, then	!find max stress value (not used in the program, only for output)
+			max_stress_n = sigmaLH_n(cn)
+		*ENDIF
+		*IF, sigmaLH_n(cn), lt, min_stress_n, then	!find min stress value
+			min_stress_n = sigmaLH_n(cn)
+		*ENDIF
+		
+		*IF, sigmaLH_t(cn), gt, max_stress_t, then	!find max stress value (not used in the program, only for output)
+			max_stress_t = sigmaLH_t(cn)
+		*ENDIF
+		*IF, sigmaLH_t(cn), lt, min_stress_t, then	!find min stress value
+			min_stress_t = sigmaLH_t(cn)
+		*ENDIF
+		
+		*IF, sigma1test, lt, sigma1max, then
+			sigma1test = sigma1max
+		*ENDIF
+	*ENDDO
+*ENDIF
