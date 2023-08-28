@@ -24,8 +24,10 @@
 
 *IF, max_psi_n, ge, max_psi_t, then
 	max_psi_node = max_psi_n_node
+	max_psi = max_psi_n
 *ELSE
 	max_psi_node = max_psi_t_node
+	max_psi = max_psi_t
 *ENDIF
 
 max_psi_group = listOfGroups(max_psi_node)

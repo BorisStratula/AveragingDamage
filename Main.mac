@@ -21,12 +21,13 @@
 *SET, dislocationKillThreshold, 0.5
 
 *SET, ResumePreviousCalculation, 'no'
-*SET, TotalSteps, 4000
+*SET, TotalSteps, 15
 *SET, CalcRegime, 'TakeOff'
 *SET, DesiredBulkStressRatio, 0.25
 *SET, DoYouWantToNormalize, 0
 *SET, CalculateAngleToDeadNode, 0
-*SET, DoAverageOfDamage, 'yes'
+*SET, DoAverageOfDamage, 'no'
+*SET, DoAverageOfStress, 'yes'
 
 *SET, PlaneShift, 0
 *SET, XFrame, 0
@@ -88,6 +89,20 @@ allsel
 	
 	*IF, InternalStep, eq, 'StressCalculation', then
 		/INPUT, StressCalculation, mac, FunctionsFolder(1), , 1
+		InternalStep = 'LocateMaxStress'
+	*ENDIF
+	
+	*IF, InternalStep, eq, 'LocateMaxStress', then
+		/INPUT, LocateMaxStress,  mac, FunctionsFolder(1), , 1
+		*IF, DoAverageOfStress, eq, 'yes', then
+			InternalStep = 'AveragingStress'
+		*ELSE
+			InternalStep = 'BCalculation'
+		*ENDIF
+	*ENDIF
+	
+	*IF, InternalStep, eq, 'AveragingStress', then
+		/INPUT, AveragingStress,  mac, FunctionsFolder(1), , 1
 		InternalStep = 'BCalculation'
 	*ENDIF
 	
@@ -97,7 +112,7 @@ allsel
 	*ENDIF
 	
 	*IF, InternalStep, eq, 'DrawingImages', then
-		*IF, MOD(GlobalStep,10), eq, 0, then
+		*IF, MOD(GlobalStep,1), eq, 0, then
 			/INPUT, DrawingImages, mac, FunctionsFolder(1), , 1		
 		*ENDIF
 		InternalStep = 'CalculatingDamage'

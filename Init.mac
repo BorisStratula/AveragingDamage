@@ -78,11 +78,15 @@ WPROTA, 0, 0, 0
 *DIM, psi_n_tilda, array, ntot
 *DIM, sigmaLH_n, array, ntot
 *DIM, sigmaVH_n, array, ntot
+*DIM, sigmaLH_n_tilda, array, ntot
+*DIM, sigmaVH_n_tilda, array, ntot
 *DIM, B_n, array, ntot
 *DIM, psi_t, array, ntot
 *DIM, psi_t_tilda, array, ntot
 *DIM, sigmaLH_t, array, ntot
 *DIM, sigmaVH_t, array, ntot
+*DIM, sigmaLH_t_tilda, array, ntot
+*DIM, sigmaVH_t_tilda, array, ntot
 *DIM, B_t, array, ntot
 *DIM, psi, array, ntot
 *DIM, listOfGroups, ARRAY, ntot
@@ -98,6 +102,7 @@ WPROTA, 0, 0, 0
 	*SET, listOfCentralNodes(cn), 0
 *ENDDO
 
+*SET, isItTheFirstCreateGroupCall, 1
 *SET, amountOfAveragedGroups, 0
 *SET, amountOfAveragedGroupsLeft, 0
 

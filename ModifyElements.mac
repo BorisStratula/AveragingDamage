@@ -20,37 +20,8 @@
 
 /COM, ########## selecting nodes to kill ##########
 
-! Old way to kill elements
-*IF, DoAverageOfDamage, eq, 'no', then
-
-	*DO, ce, 1, numelem
-		KillThisElement = 0
-		*DO, i, 1, 4
-			*GET, node_num, ELEM, ce, NODE, i
-			*IF, psi(node_num), gt, max_acceptable_psi, then
-				KillThisElement = 1
-			*ENDIF
-		*ENDDO
-		*IF, KillThisElement, eq, 1, then
-			EKILL, ce
-		*ENDIF
-	*ENDDO
-	
-	*DO, cn, 1, ntot
-		*IF, psi(cn), ge, max_acceptable_psi, then
-			*IF, psi_n(cn), ge, psi_t(cn), then
-				nodes_to_kill_n = nodes_to_kill_n + 1
-			*ELSE
-				nodes_to_kill_t = nodes_to_kill_t + 1
-			*ENDIF
-			*SET, psi_n(cn), -1
-			*SET, psi_t(cn), -1
-		*ENDIF
-	*ENDDO
-	
-*ELSE
 ! New way to kill elements and groups
-
+*IF, DoAverageOfDamage, eq, 'yes', or, DoAverageOfStress, eq, 'yes', then
 	*IF, max_psi, ge, max_acceptable_psi, then
 		*DO, ce, 1, numelem
 			*DO, i, 1, 4
@@ -68,20 +39,6 @@
 		flagToZeroAfterwards = 0
 		*DO, iterator1, 2, listOfFriends(max_psi_group, 1) + 1
 			cn = listOfFriends(max_psi_group, iterator1)
-			*IF, GlobalStep, eq, 75, then
-				*STATUS, listOfFriends, max_psi_group, max_psi_group
-				*STATUS, max_psi_group
-				*STATUS, iterator1
-				*STATUS, cn
-				*STATUS, psi, 205, 205
-				*STATUS, psi, 206, 206
-				*STATUS, psi, 1222, 1222
-				*STATUS, psi, 1239, 1239
-				*STATUS, psi, 1282, 1282
-				*STATUS, psi, 1481, 1481
-				*STATUS, psi, 1487, 1487
-				*STATUS, psi, 1666, 1666
-			*ENDIF
 			
 			*IF, psi(cn), ge, max_acceptable_group_psi, then
 				*IF, psi_n(cn), ge, psi_t(cn), then
@@ -121,8 +78,35 @@
 		
 		amountOfAveragedGroupsLeft = amountOfAveragedGroupsLeft - 1
 	*ENDIF
-
+*ELSE
+	! Old way to kill elements
+	*DO, ce, 1, numelem
+		KillThisElement = 0
+		*DO, i, 1, 4
+			*GET, node_num, ELEM, ce, NODE, i
+			*IF, psi(node_num), gt, max_acceptable_psi, then
+				KillThisElement = 1
+			*ENDIF
+		*ENDDO
+		*IF, KillThisElement, eq, 1, then
+			EKILL, ce
+		*ENDIF
+	*ENDDO
 *ENDIF
+
+
+*DO, cn, 1, ntot
+	*IF, psi(cn), ge, max_acceptable_psi, then
+		*IF, psi_n(cn), ge, psi_t(cn), then
+			nodes_to_kill_n = nodes_to_kill_n + 1
+		*ELSE
+			nodes_to_kill_t = nodes_to_kill_t + 1
+		*ENDIF
+		*SET, psi_n(cn), -1
+		*SET, psi_t(cn), -1
+	*ENDIF
+*ENDDO
+
 
 total_dead_nodes_n = total_dead_nodes_n + nodes_to_kill_n
 total_dead_nodes_t = total_dead_nodes_t + nodes_to_kill_t

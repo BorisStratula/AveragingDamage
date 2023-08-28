@@ -1,7 +1,9 @@
 
 !Array initiation
 
-*IF, GlobalStep, eq, 1, then
+!*IF, GlobalStep, eq, 1, then
+*IF, isItTheFirstCreateGroupCall, eq, 1, then
+	isItTheFirstCreateGroupCall = 0
 	*GET, myX, NODE, newCentralNode, LOC, X
 	*GET, myY, NODE, newCentralNode, LOC, Y
 	*GET, myZ, NODE, newCentralNode, LOC, Z
@@ -54,7 +56,7 @@ alphaIntegral = 0
 		numberOfFriends = numberOfFriends + 1
 		listOfFriends(newCentralNode, numberOfFriends + 1) = possibleFriend
 		rij = distance/dislocationRadius
-		listOfAlphaInf(newCentralNode, numberOfFriends + 1) = (1 - rij**4)**2
+		listOfAlphaInf(newCentralNode, numberOfFriends + 1) = (1 - rij**2)**2
 		!listOfAlphaInf(newCentralNode, numberOfFriends + 1) = 1
 		alphaIntegral = alphaIntegral + listOfAlphaInf(newCentralNode, numberOfFriends + 1)
 		listOfGroups(possibleFriend) = newCentralNode
@@ -105,9 +107,9 @@ listOfCentralNodes(amountOfAveragedGroups) = newCentralNode
 	listOfAlphaD(currentNode, 1) = numberOfFriends
 *ENDDO
 
-*IF, GlobalStep, eq, 1, then
-	*STATUS, listOfFriends, newCentralNode, newCentralNode
-	*STATUS, listOfAlphaInf, newCentralNode, newCentralNode
-	*STATUS, listOfAlphaD, newCentralNode, newCentralNode
-	*STATUS, listOfAlphaD, 196, 196
-*ENDIF
+!*IF, GlobalStep, eq, 1, then
+!	*STATUS, listOfFriends, newCentralNode, newCentralNode
+!	*STATUS, listOfAlphaInf, newCentralNode, newCentralNode
+!	*STATUS, listOfAlphaD, newCentralNode, newCentralNode
+!	*STATUS, listOfAlphaD, newCentralNode, newCentralNode
+!*ENDIF

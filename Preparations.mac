@@ -1,10 +1,10 @@
 ntot = max_valid_node
 
 !resetting some counters #####
-max_stress_n = 0				!#
-max_stress_t = 0
-min_stress_n = 1e15			!#
-min_stress_t = 1e15
+!max_stress_n = 0				!#
+!max_stress_t = 0
+!min_stress_n = 1e15			!#
+!min_stress_t = 1e15
 min_dN = 1e15				!#
 							!#
 nodes_to_kill_n = 0			!#

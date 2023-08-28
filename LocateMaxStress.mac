@@ -1,0 +1,30 @@
+max_stress_n = 0				!#
+max_stress_t = 0
+min_stress_n = 1e15			!#
+min_stress_t = 1e15
+
+*DO, cn, 1, ntot, 1
+	*IF, sigmaLH_n(cn), gt, max_stress_n, then	!find max stress value (not used in the program, only for output)
+		max_stress_n = sigmaLH_n(cn)
+		max_stress_n_node = cn
+	*ENDIF
+	*IF, sigmaLH_n(cn), lt, min_stress_n, then	!find min stress value
+		min_stress_n = sigmaLH_n(cn)
+	*ENDIF
+	
+	*IF, sigmaLH_t(cn), gt, max_stress_t, then	!find max stress value (not used in the program, only for output)
+		max_stress_t = sigmaLH_t(cn)
+		max_stress_t_node = cn
+	*ENDIF
+	*IF, sigmaLH_t(cn), lt, min_stress_t, then	!find min stress value
+		min_stress_t = sigmaLH_t(cn)
+	*ENDIF
+*ENDDO
+
+*IF, max_stress_n, ge, max_stress_t, then
+	max_stress_node = max_stress_n_node
+*ELSE
+	max_stress_node = max_stress_t_node
+*ENDIF
+
+max_stress_group = listOfGroups(max_stress_node)
