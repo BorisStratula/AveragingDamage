@@ -11,17 +11,19 @@
 *SET, N, 0											!#
 *SET, psi_start, 1e-8								!#
 *SET, max_acceptable_psi, 0.99 !0.99999				!#
-*SET, max_acceptable_group_psi, 0.5
+*SET, max_acceptable_group_psi, 0.01
 *SET, psi_stretch, 0.2								!#
 *SET, psi_twist, 0.95
 *SET, E_Fin, 0.1
 *SET, line_a, (E_Fin*psi_twist + psi_stretch*psi_twist - 1) / (psi_twist - 1)
 *SET, line_b, (1 - psi_stretch*psi_twist - E_Fin) / (psi_twist - 1)
-*SET, dislocationRadius, 2.1e-4
+*SET, dislocationRadius, 1.1e-4
 *SET, dislocationKillThreshold, 0.5
+*SET, dislocationRPower, 4
+*SET, dislocationMainPower, 2
 
 *SET, ResumePreviousCalculation, 'no'
-*SET, TotalSteps, 15
+*SET, TotalSteps, 12
 *SET, CalcRegime, 'TakeOff'
 *SET, DesiredBulkStressRatio, 0.25
 *SET, DoYouWantToNormalize, 0

@@ -56,7 +56,7 @@ alphaIntegral = 0
 		numberOfFriends = numberOfFriends + 1
 		listOfFriends(newCentralNode, numberOfFriends + 1) = possibleFriend
 		rij = distance/dislocationRadius
-		listOfAlphaInf(newCentralNode, numberOfFriends + 1) = (1 - rij**2)**2
+		listOfAlphaInf(newCentralNode, numberOfFriends + 1) = (1 - rij**dislocationRPower)**dislocationMainPower
 		!listOfAlphaInf(newCentralNode, numberOfFriends + 1) = 1
 		alphaIntegral = alphaIntegral + listOfAlphaInf(newCentralNode, numberOfFriends + 1)
 		listOfGroups(possibleFriend) = newCentralNode
@@ -94,7 +94,7 @@ listOfCentralNodes(amountOfAveragedGroups) = newCentralNode
 			numberOfFriends = numberOfFriends + 1
 			listOfFriends(currentNode, numberOfFriends + 1) = memberNode
 			rij = distance/dislocationRadius
-			listOfAlphaInf(currentNode, numberOfFriends + 1) = (1 - rij**4)**2
+			listOfAlphaInf(currentNode, numberOfFriends + 1) = (1 - rij**dislocationRPower)**dislocationMainPower
 			!listOfAlphaInf(currentNode, numberOfFriends + 1) = 1
 			alphaIntegral = alphaIntegral + listOfAlphaInf(currentNode, numberOfFriends + 1)
 		*ENDIF
