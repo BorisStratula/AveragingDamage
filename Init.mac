@@ -64,7 +64,7 @@ WPROTA, 0, 0, 0
 ESEL, S, ELEM, , lowestDravingElement, highestDravingElement
 eplot
 allsel
-/triad, on
+/triad, off
 WPROTA, 0, 0, 0
 WPROTA, 0, 0, 0
 

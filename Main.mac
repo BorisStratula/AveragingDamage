@@ -17,19 +17,19 @@
 *SET, E_Fin, 0.1
 *SET, line_a, (E_Fin*psi_twist + psi_stretch*psi_twist - 1) / (psi_twist - 1)
 *SET, line_b, (1 - psi_stretch*psi_twist - E_Fin) / (psi_twist - 1)
-*SET, dislocationRadius, 1.1e-4
+*SET, dislocationRadius, 2.1e-4
 *SET, dislocationKillThreshold, 0.5
 *SET, dislocationRPower, 4
 *SET, dislocationMainPower, 2
 
 *SET, ResumePreviousCalculation, 'no'
-*SET, TotalSteps, 12
+*SET, TotalSteps, 1000
 *SET, CalcRegime, 'TakeOff'
 *SET, DesiredBulkStressRatio, 0.25
 *SET, DoYouWantToNormalize, 0
 *SET, CalculateAngleToDeadNode, 0
-*SET, DoAverageOfDamage, 'no'
-*SET, DoAverageOfStress, 'yes'
+*SET, DoAverageOfDamage, 'yes'
+*SET, DoAverageOfStress, 'no'
 
 *SET, PlaneShift, 0
 *SET, XFrame, 0
@@ -64,7 +64,7 @@ ESEL, S, ENAME, , 187
 *GET, numelem, ELEM,,COUNT
 *SET, lowestDravingElement, 1
 *SET, highestDravingElement, numelem
-*SET, centralDravingNode1, 194
+*SET, centralDravingNode1, 204
 *SET, centralDravingNode2, centralDravingNode1
 allsel
 
