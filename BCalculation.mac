@@ -1,6 +1,12 @@
 /POST1
 
 *DO, cn, 1, ntot, 1
+!temporary fix for the holed specimen
+	*IF, NX(cn), ge, 0, then
+		B_n(cn) = 0
+		B_t(cn) = 0
+		*CYCLE
+	*ENDIF
 !evaluating damage parameters ####################################################################################
 	*IF, psi_n(cn), ge, 0, then																						!#
 		*IF, sigmaVH_n(cn), lt, sigmaUT, then																			!#

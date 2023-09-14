@@ -4,7 +4,7 @@ ESEL, S, ELEM, , lowestDravingElement, highestDravingElement
 
 /GRAPHICS, POWER
 !plot_distance = 3e-3
-plot_distance = 6e-4
+plot_distance = 1.5e-2
 /CPLANE, 1
 
 NWPAVE, centralDravingNode1
@@ -17,7 +17,7 @@ NWPAVE, centralDravingNode1
 /window, 2, off
 /window, 3, off
 /window, 4, off
-/TYPE, 1, 1
+/TYPE, 1, 6
 /view, 1, wp
 /angle, 1, 0
 /vup, 1, -x
@@ -28,11 +28,9 @@ NWPAVE, centralDravingNode1
 *VPUT, psi_n(1), node, 1, u, y
 plnsol, u, y
 
-WPROTA, 0, 90, 0
-
 /window, 1, off
 /window, 2, on
-/TYPE, 2, 1
+/TYPE, 2, 6
 /view, 2, wp
 /angle, 2, 0
 /vup, 2, -x
@@ -45,6 +43,7 @@ plnsol, u, y
 
 !WPROTA, 0, 0, 0
 !WPROTA, 0, -180, 0
+!WPROTA, 0, 90, 0
 
 
 NWPAVE, centralDravingNode2
@@ -78,7 +77,7 @@ plnsol, u, y
 *VPUT, sigmaLH_t(1), node, 1, u, y
 plnsol, u, y
 !WPROTA, 0, 0, 45
-WPROTA, 0, -90, 0
+!WPROTA, 0, -90, 0
 
 allsel
 

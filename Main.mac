@@ -17,7 +17,7 @@
 *SET, E_Fin, 0.1
 *SET, line_a, (E_Fin*psi_twist + psi_stretch*psi_twist - 1) / (psi_twist - 1)
 *SET, line_b, (1 - psi_stretch*psi_twist - E_Fin) / (psi_twist - 1)
-*SET, dislocationRadius, 2.1e-4
+*SET, dislocationRadius, 1.1e-4
 *SET, dislocationKillThreshold, 0.5
 *SET, dislocationRPower, 4
 *SET, dislocationMainPower, 2
@@ -64,7 +64,7 @@ ESEL, S, ENAME, , 187
 *GET, numelem, ELEM,,COUNT
 *SET, lowestDravingElement, 1
 *SET, highestDravingElement, numelem
-*SET, centralDravingNode1, 204
+*SET, centralDravingNode1, 1
 *SET, centralDravingNode2, centralDravingNode1
 allsel
 

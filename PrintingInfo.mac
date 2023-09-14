@@ -30,4 +30,4 @@ psiOfTheFirstGroup = psiOfTheFirstGroup
 !#############################################################
 /NOPR
 
-*STATUS, listOfFriends, max_stress_node, max_stress_node
+!*STATUS, listOfFriends, max_stress_node, max_stress_node

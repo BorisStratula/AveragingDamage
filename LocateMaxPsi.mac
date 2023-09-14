@@ -32,4 +32,4 @@
 
 max_psi_group = listOfGroups(max_psi_node)
 
-*STATUS, max_psi_node
+!*STATUS, max_psi_node
