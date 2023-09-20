@@ -19,8 +19,8 @@ min_stress_t = min_stress_t
 may_die_n = may_die_n											!#
 may_die_t = may_die_t
 DeadNodeID = DeadNodeID
-!max_psi_node = max_psi_node
-!max_psi_group = max_psi_group
+max_psi_node = max_psi_node
+max_psi_group = max_psi_group
 max_stress_node = max_stress_node
 max_stress_group = max_stress_group
 amountOfAveragedGroups = amountOfAveragedGroups
@@ -30,4 +30,4 @@ psiOfTheFirstGroup = psiOfTheFirstGroup
 !#############################################################
 /NOPR
 
-!*STATUS, listOfFriends, max_stress_node, max_stress_node
+!*STATUS, listOfFriends, 1, 100, 1, 1

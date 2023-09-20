@@ -37,33 +37,62 @@
 		
 		!max_psi_group = listOfGroups(max_psi_node)
 		flagToZeroAfterwards = 0
-		*DO, iterator1, 2, listOfFriends(max_psi_group, 1) + 1
-			cn = listOfFriends(max_psi_group, iterator1)
-			
-			*IF, psi(cn), ge, max_acceptable_group_psi, then
-				*IF, psi_n(cn), ge, psi_t(cn), then
-					nodes_to_kill_n = nodes_to_kill_n + 1
+		
+		*IF, max_psi_group, ne, 0, then
+			*DO, iterator1, 2, listOfFriends(max_psi_group, 1) + 1
+				cn = listOfFriends(max_psi_group, iterator1)
+				
+				*IF, psi(cn), ge, max_acceptable_group_psi, then
+					*IF, psi_n(cn), ge, psi_t(cn), then
+						nodes_to_kill_n = nodes_to_kill_n + 1
+					*ELSE
+						nodes_to_kill_t = nodes_to_kill_t + 1
+					*ENDIF
+					psi_n(cn) = -1
+					psi_t(cn) = -1
+					psi(cn) = -1
 				*ELSE
-					nodes_to_kill_t = nodes_to_kill_t + 1
+					*IF, cn, eq, max_psi_group, then
+						flagToZeroAfterwards = 1
+						*CYCLE
+					*ENDIF
+					listOfGroups(cn) = 0
+					iterationsToDo2 = listOfFriends(cn, 1) + 1
+					*DO, iterator2, 1, iterationsToDo2
+						listOfFriends(cn, iterator2) = 0
+						listOfAlphaInf(cn, iterator2) = 0
+						listOfAlphaD(cn, iterator2) = 0
+					*ENDDO
 				*ENDIF
-				psi_n(cn) = -1
-				psi_t(cn) = -1
-				psi(cn) = -1
-			*ELSE
-				*IF, cn, eq, max_psi_group, then
-					flagToZeroAfterwards = 1
-					*CYCLE
-				*ENDIF
-				listOfGroups(cn) = 0
-				iterationsToDo2 = listOfFriends(cn, 1) + 1
-				*DO, iterator2, 1, iterationsToDo2
-					listOfFriends(cn, iterator2) = 0
-					listOfAlphaInf(cn, iterator2) = 0
-					listOfAlphaD(cn, iterator2) = 0
-				*ENDDO
-			*ENDIF
-			
-		*ENDDO
+		
+			*ENDDO
+		*ELSEIF, max_psi_group, eq, 0, then
+		!*IF, max_psi_group, eq, 0, then
+		!	cn = max_psi_node
+		!	
+		!	*IF, psi(cn), ge, max_acceptable_group_psi, then
+		!		*IF, psi_n(cn), ge, psi_t(cn), then
+		!			nodes_to_kill_n = nodes_to_kill_n + 1
+		!		*ELSE
+		!			nodes_to_kill_t = nodes_to_kill_t + 1
+		!		*ENDIF
+		!		psi_n(cn) = -1
+		!		psi_t(cn) = -1
+		!		psi(cn) = -1
+		!	*ELSE
+		!		*IF, cn, eq, max_psi_group, then
+		!			flagToZeroAfterwards = 1
+		!			*CYCLE
+		!		*ENDIF
+		!		listOfGroups(cn) = 0
+		!		iterationsToDo2 = listOfFriends(cn, 1) + 1
+		!		*DO, iterator2, 1, iterationsToDo2
+		!			listOfFriends(cn, iterator2) = 0
+		!			listOfAlphaInf(cn, iterator2) = 0
+		!			listOfAlphaD(cn, iterator2) = 0
+		!		*ENDDO
+		!	*ENDIF
+		*ENDIF
 		
 		*IF, flagToZeroAfterwards, eq, 1, then
 			cn = max_psi_group
