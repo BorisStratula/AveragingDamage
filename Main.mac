@@ -12,7 +12,7 @@
 *SET, psi_start, 1e-8								!#
 *SET, max_acceptable_psi, 0.99 !0.99999				!#
 *SET, max_acceptable_group_psi, 0.01
-*SET, psi_stretch, 0.2								!#
+*SET, psi_stretch, 0.05								!#
 *SET, psi_twist, 0.95
 *SET, E_Fin, 0.1
 *SET, line_a, (E_Fin*psi_twist + psi_stretch*psi_twist - 1) / (psi_twist - 1)
@@ -21,9 +21,10 @@
 *SET, dislocationKillThreshold, 0.5
 *SET, dislocationRPower, 4
 *SET, dislocationMainPower, 2
+*SET, scaleFactor, 0.5
 
 *SET, ResumePreviousCalculation, 'no'
-*SET, TotalSteps, 1000
+*SET, TotalSteps, 50000
 *SET, CalcRegime, 'TakeOff'
 *SET, DesiredBulkStressRatio, 0.25
 *SET, DoYouWantToNormalize, 0
@@ -47,7 +48,10 @@
 *SET, stepThreshold, 0.95							!#	if psi is above the value then node may go to die
 *SET, stepMultiplier, 0.5							!#	if psi below stepThreshold then step is multiplied by the value
 *SET, maxPsiToApply, 0.9							!#	when psi is above it the psi is cut down to this value
-*SET, Nmin, 1.0e4										!#							!#
+*SET, Nmin, 1.0e4										!#
+!*IF, DoAverageOfDamage, eq, 'yes', then
+!	*SET, stepMultiplier, 1.0
+!*ENDIF
 													!#
 *SET, betaVH, 0.3
 *SET, betaLH, 0.277
@@ -60,11 +64,13 @@
 *SET, sigmaU0T, 300e6								!#
 *SET, dsigma, (sigmaB - sigmaU)*10**(-5*betaLH)		!#
 
-ESEL, S, ENAME, , 187
+*GET, MainElementType, ETYP, 1, ATTR, ENAM
+!ESEL, S, ENAME, , 187
+ESEL, S, ENAME, , MainElementType
 *GET, numelem, ELEM,,COUNT
 *SET, lowestDravingElement, 1
 *SET, highestDravingElement, numelem
-*SET, centralDravingNode1, 1
+*SET, centralDravingNode1, 2
 *SET, centralDravingNode2, centralDravingNode1
 allsel
 
@@ -114,7 +120,7 @@ allsel
 	*ENDIF
 	
 	*IF, InternalStep, eq, 'DrawingImages', then
-		*IF, MOD(GlobalStep,1), eq, 0, then
+		*IF, MOD(GlobalStep,10), eq, 0, then
 			/INPUT, DrawingImages, mac, FunctionsFolder(1), , 1		
 		*ENDIF
 		InternalStep = 'CalculatingDamage'

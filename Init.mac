@@ -47,7 +47,7 @@ WPROTA, 0, 0, 0
 /view, 1, wp
 /angle, 1, 0			
 /vup, 1, -x			
-/dist, 1, 1e-2	
+/dist, 1, 4e-3	
 /dscale, all, 1e-20			
 /PLOPTS, MINM, 0			
 /gfile, 2400				
