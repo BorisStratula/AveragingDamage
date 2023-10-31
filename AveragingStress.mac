@@ -2,31 +2,97 @@
 	initiateGroupsAmount = 10
 	*DO, groupNumber, 1, initiateGroupsAmount
 		/INPUT, LocateMaxStress, mac, FunctionsFolder(1), , 1
-		*STATUS, wtfIsGoingOn
-		*STATUS, max_stress_node
+		!*STATUS, wtfIsGoingOn
+		!*STATUS, max_stress_node
 		*IF, max_stress_group, eq, 0, then
 			newCentralNode = max_stress_node
 			max_stress_group = newCentralNode
 			/INPUT, CreateNewGroup, mac, FunctionsFolder(1), , 1
 			
 			centralNode = listOfCentralNodes(amountOfAveragedGroups)
-		
-			! simplified way to average
-			!sigma_n_sum = 0
-			!sigma_t_sum = 0
-			!*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
-			!	currentNode = listOfFriends(centralNode, currentGroupMember)
-			!	sigma_n_sum = sigma_n_sum + sigmaLH_n(currentNode)
-			!	sigma_t_sum = sigma_t_sum + sigmaLH_t(currentNode)
-			!*ENDDO
-			!*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
-			!	currentNode = listOfFriends(centralNode, currentGroupMember)
-			!	sigmaLH_n(currentNode) = sigma_n_sum/listOfFriends(centralNode, 1)
-			!	sigmaLH_t(currentNode) = sigma_t_sum/listOfFriends(centralNode, 1)
-			!	sigmaVH_n(currentNode) = sigmaLH_n(currentNode)
-			!	sigmaVH_t(currentNode) = sigmaLH_t(currentNode)
-			!*ENDDO
 			
+			*IF, StressAveragingStyle, eq, 'step', then
+				! simplified way to average
+				sigma_n_sum = 0
+				sigma_t_sum = 0
+				*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
+					currentNode = listOfFriends(centralNode, currentGroupMember)
+					sigma_n_sum = sigma_n_sum + sigmaLH_n(currentNode)
+					sigma_t_sum = sigma_t_sum + sigmaLH_t(currentNode)
+				*ENDDO
+				*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
+					currentNode = listOfFriends(centralNode, currentGroupMember)
+					sigmaLH_n(currentNode) = sigma_n_sum/listOfFriends(centralNode, 1)
+					sigmaLH_t(currentNode) = sigma_t_sum/listOfFriends(centralNode, 1)
+					sigmaVH_n(currentNode) = sigmaLH_n(currentNode)
+					sigmaVH_t(currentNode) = sigmaLH_t(currentNode)
+				*ENDDO
+			*ELSE
+				!original way to average
+				*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
+					currentNode = listOfFriends(centralNode, currentGroupMember)
+					sigmaLH_n_tilda(currentNode) = 0
+					sigmaLH_t_tilda(currentNode) = 0
+					
+					*DO, memberOfGroup, 2, listOfFriends(currentNode, 1) + 1
+						memberNumber = listOfFriends(currentNode, memberOfGroup)
+						*DO, iterator2, 2, listOfFriends(memberNumber, 1) + 1
+							*IF, listOfFriends(memberNumber, iterator2), eq, currentNode, then
+								revertAlphaD = listOfAlphaD(memberNumber, iterator2)
+								*EXIT
+							*ENDIF
+						*ENDDO
+						sigmaLH_n_tilda(currentNode) = sigmaLH_n_tilda(currentNode) + sigmaLH_n(listOfFriends(currentNode, memberOfGroup))*revertAlphaD
+						sigmaLH_t_tilda(currentNode) = sigmaLH_t_tilda(currentNode) + sigmaLH_t(listOfFriends(currentNode, memberOfGroup))*revertAlphaD
+					*ENDDO
+				*ENDDO
+				*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
+					currentNode = listOfFriends(centralNode, currentGroupMember)
+					sigmaLH_n(currentNode) = sigmaLH_n_tilda(currentNode)
+					sigmaLH_t(currentNode) = sigmaLH_t_tilda(currentNode)
+					sigmaVH_n(currentNode) = sigmaLH_n(currentNode)
+					sigmaVH_t(currentNode) = sigmaLH_t(currentNode)
+				*ENDDO
+			*ENDIF
+		
+			/INPUT, LocateMaxStress, mac, FunctionsFolder(1), , 1
+		*ENDIF
+	*ENDDO
+*ELSE
+	*IF, max_stress_group, eq, 0, then
+		newCentralNode = max_stress_node
+		max_stress_group = newCentralNode
+		/INPUT, CreateNewGroup, mac, FunctionsFolder(1), , 1
+	*ENDIF
+	
+	*DO, groupNumber, 1, amountOfAveragedGroups
+		*IF, listOfCentralNodes(groupNumber), eq, 0, then
+			*CYCLE
+		*ENDIF
+		centralNode = listOfCentralNodes(groupNumber)
+		
+		*STATUS, wtfIsGoingOn
+		*STATUS, centralNode
+		*STATUS, listOfFriends, centralNode, centralNode
+		*STATUS, sigmaLH_n, centralNode, centralNode
+		
+		*IF, StressAveragingStyle, eq, 'step', then		
+			! simplified way
+			sigma_n_sum = 0
+			sigma_t_sum = 0
+			*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
+				currentNode = listOfFriends(centralNode, currentGroupMember)
+				sigma_n_sum = sigma_n_sum + sigmaLH_n(currentNode)
+				sigma_t_sum = sigma_t_sum + sigmaLH_t(currentNode)
+			*ENDDO
+			*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
+				currentNode = listOfFriends(centralNode, currentGroupMember)
+				sigmaLH_n(currentNode) = sigma_n_sum/listOfFriends(centralNode, 1)
+				sigmaLH_t(currentNode) = sigma_t_sum/listOfFriends(centralNode, 1)
+				sigmaVH_n(currentNode) = sigmaLH_n(currentNode)
+				sigmaVH_t(currentNode) = sigmaLH_t(currentNode)
+			*ENDDO			
+		*ELSE		
 			!original way to average
 			*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
 				currentNode = listOfFriends(centralNode, currentGroupMember)
@@ -51,68 +117,29 @@
 				sigmaLH_t(currentNode) = sigmaLH_t_tilda(currentNode)
 				sigmaVH_n(currentNode) = sigmaLH_n(currentNode)
 				sigmaVH_t(currentNode) = sigmaLH_t(currentNode)
-			*ENDDO
-			/INPUT, LocateMaxStress, mac, FunctionsFolder(1), , 1
+			*ENDDO		
 		*ENDIF
+		
+		*STATUS, sigmaLH_n, centralNode, centralNode
+		
+		
 	*ENDDO
-*ELSE
+	
+	*STATUS, wtfIsGoingOn2
+	*STATUS, max_stress_node
+	
+	/INPUT, LocateMaxStress, mac, FunctionsFolder(1), , 1
+	
 	*IF, max_stress_group, eq, 0, then
 		newCentralNode = max_stress_node
 		max_stress_group = newCentralNode
 		/INPUT, CreateNewGroup, mac, FunctionsFolder(1), , 1
 	*ENDIF
 	
-	*DO, groupNumber, 1, amountOfAveragedGroups
-		*IF, listOfCentralNodes(groupNumber), eq, 0, then
-			*CYCLE
-		*ENDIF
-		centralNode = listOfCentralNodes(groupNumber)
-		
-		! simplified way
-		!sigma_n_sum = 0
-		!sigma_t_sum = 0
-		!*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
-		!	currentNode = listOfFriends(centralNode, currentGroupMember)
-		!	sigma_n_sum = sigma_n_sum + sigmaLH_n(currentNode)
-		!	sigma_t_sum = sigma_t_sum + sigmaLH_t(currentNode)
-		!*ENDDO
-		!*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
-		!	currentNode = listOfFriends(centralNode, currentGroupMember)
-		!	sigmaLH_n(currentNode) = sigma_n_sum/listOfFriends(centralNode, 1)
-		!	sigmaLH_t(currentNode) = sigma_t_sum/listOfFriends(centralNode, 1)
-		!	sigmaVH_n(currentNode) = sigmaLH_n(currentNode)
-		!	sigmaVH_t(currentNode) = sigmaLH_t(currentNode)
-		!*ENDDO
-		
-		!original way to average
-		*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
-			currentNode = listOfFriends(centralNode, currentGroupMember)
-			sigmaLH_n_tilda(currentNode) = 0
-			sigmaLH_t_tilda(currentNode) = 0
-			
-			*DO, memberOfGroup, 2, listOfFriends(currentNode, 1) + 1
-				memberNumber = listOfFriends(currentNode, memberOfGroup)
-				*DO, iterator2, 2, listOfFriends(memberNumber, 1) + 1
-					*IF, listOfFriends(memberNumber, iterator2), eq, currentNode, then
-						revertAlphaD = listOfAlphaD(memberNumber, iterator2)
-						*EXIT
-					*ENDIF
-				*ENDDO
-				sigmaLH_n_tilda(currentNode) = sigmaLH_n_tilda(currentNode) + sigmaLH_n(listOfFriends(currentNode, memberOfGroup))*revertAlphaD
-				sigmaLH_t_tilda(currentNode) = sigmaLH_t_tilda(currentNode) + sigmaLH_t(listOfFriends(currentNode, memberOfGroup))*revertAlphaD
-			*ENDDO
-		*ENDDO
-		*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
-			currentNode = listOfFriends(centralNode, currentGroupMember)
-			sigmaLH_n(currentNode) = sigmaLH_n_tilda(currentNode)
-			sigmaLH_t(currentNode) = sigmaLH_t_tilda(currentNode)
-			sigmaVH_n(currentNode) = sigmaLH_n(currentNode)
-			sigmaVH_t(currentNode) = sigmaLH_t(currentNode)
-		*ENDDO
-	*ENDDO
-	
-	/INPUT, LocateMaxStress, mac, FunctionsFolder(1), , 1
+	*STATUS, max_stress_node
+	*STATUS, max_stress_group
 
 *ENDIF
 
-!*STATUS, sigmaLH_n, 218, 218
+!*STATUS, listOfFriends, 44, 44
+!*STATUS, listOfCentralNodes

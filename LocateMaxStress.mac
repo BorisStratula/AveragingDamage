@@ -4,6 +4,10 @@ min_stress_n = 1e15			!#
 min_stress_t = 1e15
 
 *DO, cn, 1, ntot, 1
+	*IF, psi(cn), eq, -1, then
+		*CYCLE
+	*ENDIF
+	
 	*IF, sigmaLH_n(cn), gt, max_stress_n, then	!find max stress value (not used in the program, only for output)
 		max_stress_n = sigmaLH_n(cn)
 		max_stress_n_node = cn

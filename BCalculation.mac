@@ -9,6 +9,9 @@
 	*ENDIF
 !evaluating damage parameters ####################################################################################
 	*IF, psi_n(cn), ge, 0, then																						!#
+		sigmaTemp = sigmaLH_n(cn)
+		sigmaLH_n(cn) = sigmaLH_n(cn)*scaleFactor
+		sigmaVH_n(cn) = sigmaLH_n(cn)
 		*IF, sigmaVH_n(cn), lt, sigmaUT, then																			!#
 			B_n(cn) = 0																								!#
 		*ELSEIF, sigmaVH_n(cn), lt, (sigmaU + dsigma)																	!#
@@ -24,9 +27,14 @@
 			may_die_n = may_die_n + 1																					!#
 			may_die_static = may_die_static + 1																		!#
 		*ENDIF																										!#
+		sigmaLH_n(cn) = sigmaTemp
+		sigmaVH_n(cn) = sigmaLH_n(cn)
 	*ENDIF	!#########################################################################################################
 	!evaluating damage parameters ####################################################################################
 	*IF, psi_t(cn), ge, 0, then																						!#
+		sigmaTemp = sigmaLH_t(cn)
+		sigmaLH_t(cn) = sigmaLH_t(cn)*scaleFactor
+		sigmaVH_t(cn) = sigmaLH_t(cn)
 		*IF, sigmaVH_t(cn), lt, sigmaUT, then																			!#
 			B_t(cn) = 0																								!#
 		*ELSEIF, sigmaVH_t(cn), lt, (sigmaU + dsigma)																	!#
@@ -42,6 +50,8 @@
 			may_die_t = may_die_t + 1																					!#
 			may_die_static = may_die_static + 1																		!#
 		*ENDIF																										!#
+		sigmaLH_t(cn) = sigmaTemp
+		sigmaVH_t(cn) = sigmaLH_t(cn)
 	*ENDIF	!#########################################################################################################
 	
 	!evaluating number of cycles in step	##########################################################

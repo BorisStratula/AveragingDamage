@@ -140,4 +140,9 @@
 total_dead_nodes_n = total_dead_nodes_n + nodes_to_kill_n
 total_dead_nodes_t = total_dead_nodes_t + nodes_to_kill_t
 
+*SET, kill_something, 0
+*IF, nodes_to_kill_n + nodes_to_kill_t, gt, 0, then
+	kill_something = 1
+*ENDIF
+
 allsel

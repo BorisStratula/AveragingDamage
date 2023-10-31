@@ -17,11 +17,14 @@
 *SET, E_Fin, 0.1
 *SET, line_a, (E_Fin*psi_twist + psi_stretch*psi_twist - 1) / (psi_twist - 1)
 *SET, line_b, (1 - psi_stretch*psi_twist - E_Fin) / (psi_twist - 1)
-*SET, dislocationRadius, 1.1e-4
+*SET, dislocationRadius, 110e-6
 *SET, dislocationKillThreshold, 0.5
 *SET, dislocationRPower, 4
 *SET, dislocationMainPower, 2
-*SET, scaleFactor, 0.5
+*SET, scaleFactor, 1
+!*SET, scaleFactor, sqrt(dislocationRadius*0.85 / 100e-6)
+!*SET, scaleFactor, ((dislocationRadius + 050e-6) / 2 / dislocationRadius)**1.5
+!*SET, scaleFactor, ((dislocationRadius + 025e-6) / 2 / dislocationRadius)**0.5
 
 *SET, ResumePreviousCalculation, 'no'
 *SET, TotalSteps, 50000
@@ -29,8 +32,9 @@
 *SET, DesiredBulkStressRatio, 0.25
 *SET, DoYouWantToNormalize, 0
 *SET, CalculateAngleToDeadNode, 0
-*SET, DoAverageOfDamage, 'yes'
-*SET, DoAverageOfStress, 'no'
+*SET, DoAverageOfDamage, 'no'
+*SET, DoAverageOfStress, 'yes'
+*SET, StressAveragingStyle, 'step'
 
 *SET, PlaneShift, 0
 *SET, XFrame, 0
