@@ -21,9 +21,9 @@
 *SET, dislocationKillThreshold, 0.5
 *SET, dislocationRPower, 4
 *SET, dislocationMainPower, 2
+*SET, nodeContribution, 0.05
+*SET, BellOrStep, 0.5
 *SET, scaleFactor, 1
-!*SET, scaleFactor, sqrt(dislocationRadius*0.85 / 100e-6)
-!*SET, scaleFactor, ((dislocationRadius + 050e-6) / 2 / dislocationRadius)**1.5
 !*SET, scaleFactor, ((dislocationRadius + 025e-6) / 2 / dislocationRadius)**0.5
 
 *SET, ResumePreviousCalculation, 'no'
@@ -33,8 +33,8 @@
 *SET, DoYouWantToNormalize, 0
 *SET, CalculateAngleToDeadNode, 0
 *SET, DoAverageOfDamage, 'no'
-*SET, DoAverageOfStress, 'yes'
-*SET, StressAveragingStyle, 'step'
+*SET, DoAverageOfStress, 'no'
+*SET, StressAveragingStyle, 'both'
 
 *SET, PlaneShift, 0
 *SET, XFrame, 0

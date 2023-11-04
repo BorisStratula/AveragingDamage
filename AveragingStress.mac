@@ -22,12 +22,14 @@
 				*ENDDO
 				*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
 					currentNode = listOfFriends(centralNode, currentGroupMember)
-					sigmaLH_n(currentNode) = sigma_n_sum/listOfFriends(centralNode, 1)
-					sigmaLH_t(currentNode) = sigma_t_sum/listOfFriends(centralNode, 1)
+					sigmaLH_n(currentNode) = sigma_n_sum/listOfFriends(centralNode, 1)*(1 - nodeContribution) + sigmaLH_n(currentNode)*nodeContribution
+					sigmaLH_t(currentNode) = sigma_t_sum/listOfFriends(centralNode, 1)*(1 - nodeContribution) + sigmaLH_t(currentNode)*nodeContribution
 					sigmaVH_n(currentNode) = sigmaLH_n(currentNode)
 					sigmaVH_t(currentNode) = sigmaLH_t(currentNode)
 				*ENDDO
-			*ELSE
+			*ENDIF
+			
+			*IF, StressAveragingStyle, eq, 'bell', then
 				!original way to average
 				*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
 					currentNode = listOfFriends(centralNode, currentGroupMember)
@@ -54,6 +56,40 @@
 					sigmaVH_t(currentNode) = sigmaLH_t(currentNode)
 				*ENDDO
 			*ENDIF
+			
+			*IF, StressAveragingStyle, eq, 'both', then
+				sigma_n_sum = 0
+				sigma_t_sum = 0
+				*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
+					currentNode = listOfFriends(centralNode, currentGroupMember)
+					sigma_n_sum = sigma_n_sum + sigmaLH_n(currentNode)
+					sigma_t_sum = sigma_t_sum + sigmaLH_t(currentNode)
+				*ENDDO
+				*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
+					currentNode = listOfFriends(centralNode, currentGroupMember)
+					sigmaLH_n_tilda(currentNode) = 0
+					sigmaLH_t_tilda(currentNode) = 0
+					
+					*DO, memberOfGroup, 2, listOfFriends(currentNode, 1) + 1
+						memberNumber = listOfFriends(currentNode, memberOfGroup)
+						*DO, iterator2, 2, listOfFriends(memberNumber, 1) + 1
+							*IF, listOfFriends(memberNumber, iterator2), eq, currentNode, then
+								revertAlphaD = listOfAlphaD(memberNumber, iterator2)
+								*EXIT
+							*ENDIF
+						*ENDDO
+						sigmaLH_n_tilda(currentNode) = sigmaLH_n_tilda(currentNode) + sigmaLH_n(listOfFriends(currentNode, memberOfGroup))*revertAlphaD
+						sigmaLH_t_tilda(currentNode) = sigmaLH_t_tilda(currentNode) + sigmaLH_t(listOfFriends(currentNode, memberOfGroup))*revertAlphaD
+					*ENDDO
+				*ENDDO
+				*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
+					currentNode = listOfFriends(centralNode, currentGroupMember)
+					sigmaLH_n(currentNode) = sigmaLH_n_tilda(currentNode)*(1 - BellOrStep) + sigma_n_sum/listOfFriends(centralNode, 1)*BellOrStep
+					sigmaLH_t(currentNode) = sigmaLH_t_tilda(currentNode)*(1 - BellOrStep) + sigma_t_sum/listOfFriends(centralNode, 1)*BellOrStep
+					sigmaVH_n(currentNode) = sigmaLH_n(currentNode)
+					sigmaVH_t(currentNode) = sigmaLH_t(currentNode)
+				*ENDDO
+			*ENDIF
 		
 			/INPUT, LocateMaxStress, mac, FunctionsFolder(1), , 1
 		*ENDIF
@@ -71,10 +107,10 @@
 		*ENDIF
 		centralNode = listOfCentralNodes(groupNumber)
 		
-		*STATUS, wtfIsGoingOn
-		*STATUS, centralNode
-		*STATUS, listOfFriends, centralNode, centralNode
-		*STATUS, sigmaLH_n, centralNode, centralNode
+		!*STATUS, wtfIsGoingOn
+		!*STATUS, centralNode
+		!*STATUS, listOfFriends, centralNode, centralNode
+		!*STATUS, sigmaLH_n, centralNode, centralNode
 		
 		*IF, StressAveragingStyle, eq, 'step', then		
 			! simplified way
@@ -87,12 +123,14 @@
 			*ENDDO
 			*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
 				currentNode = listOfFriends(centralNode, currentGroupMember)
-				sigmaLH_n(currentNode) = sigma_n_sum/listOfFriends(centralNode, 1)
-				sigmaLH_t(currentNode) = sigma_t_sum/listOfFriends(centralNode, 1)
+				sigmaLH_n(currentNode) = sigma_n_sum/listOfFriends(centralNode, 1)*(1 - nodeContribution) + sigmaLH_n(currentNode)*nodeContribution
+				sigmaLH_t(currentNode) = sigma_t_sum/listOfFriends(centralNode, 1)*(1 - nodeContribution) + sigmaLH_t(currentNode)*nodeContribution
 				sigmaVH_n(currentNode) = sigmaLH_n(currentNode)
 				sigmaVH_t(currentNode) = sigmaLH_t(currentNode)
 			*ENDDO			
-		*ELSE		
+		*ENDIF
+		
+		*IF, StressAveragingStyle, eq, 'bell', then			
 			!original way to average
 			*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
 				currentNode = listOfFriends(centralNode, currentGroupMember)
@@ -120,13 +158,47 @@
 			*ENDDO		
 		*ENDIF
 		
-		*STATUS, sigmaLH_n, centralNode, centralNode
+		*IF, StressAveragingStyle, eq, 'both', then
+			sigma_n_sum = 0
+			sigma_t_sum = 0
+			*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
+				currentNode = listOfFriends(centralNode, currentGroupMember)
+				sigma_n_sum = sigma_n_sum + sigmaLH_n(currentNode)
+				sigma_t_sum = sigma_t_sum + sigmaLH_t(currentNode)
+			*ENDDO
+			*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
+				currentNode = listOfFriends(centralNode, currentGroupMember)
+				sigmaLH_n_tilda(currentNode) = 0
+				sigmaLH_t_tilda(currentNode) = 0
+				
+				*DO, memberOfGroup, 2, listOfFriends(currentNode, 1) + 1
+					memberNumber = listOfFriends(currentNode, memberOfGroup)
+					*DO, iterator2, 2, listOfFriends(memberNumber, 1) + 1
+						*IF, listOfFriends(memberNumber, iterator2), eq, currentNode, then
+							revertAlphaD = listOfAlphaD(memberNumber, iterator2)
+							*EXIT
+						*ENDIF
+					*ENDDO
+					sigmaLH_n_tilda(currentNode) = sigmaLH_n_tilda(currentNode) + sigmaLH_n(listOfFriends(currentNode, memberOfGroup))*revertAlphaD
+					sigmaLH_t_tilda(currentNode) = sigmaLH_t_tilda(currentNode) + sigmaLH_t(listOfFriends(currentNode, memberOfGroup))*revertAlphaD
+				*ENDDO
+			*ENDDO
+			*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
+				currentNode = listOfFriends(centralNode, currentGroupMember)
+				sigmaLH_n(currentNode) = sigmaLH_n_tilda(currentNode)*(1 - BellOrStep) + sigma_n_sum/listOfFriends(centralNode, 1)*BellOrStep
+				sigmaLH_t(currentNode) = sigmaLH_t_tilda(currentNode)*(1 - BellOrStep) + sigma_t_sum/listOfFriends(centralNode, 1)*BellOrStep
+				sigmaVH_n(currentNode) = sigmaLH_n(currentNode)
+				sigmaVH_t(currentNode) = sigmaLH_t(currentNode)
+			*ENDDO
+		*ENDIF
+		
+		!*STATUS, sigmaLH_n, centralNode, centralNode
 		
 		
 	*ENDDO
 	
-	*STATUS, wtfIsGoingOn2
-	*STATUS, max_stress_node
+	!*STATUS, wtfIsGoingOn2
+	!*STATUS, max_stress_node
 	
 	/INPUT, LocateMaxStress, mac, FunctionsFolder(1), , 1
 	
@@ -136,8 +208,8 @@
 		/INPUT, CreateNewGroup, mac, FunctionsFolder(1), , 1
 	*ENDIF
 	
-	*STATUS, max_stress_node
-	*STATUS, max_stress_group
+	!*STATUS, max_stress_node
+	!*STATUS, max_stress_group
 
 *ENDIF
 
