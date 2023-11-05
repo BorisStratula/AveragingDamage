@@ -19,7 +19,7 @@
 *SET, line_b, (1 - psi_stretch*psi_twist - E_Fin) / (psi_twist - 1)
 *SET, dislocationRadius, 110e-6
 *SET, dislocationKillThreshold, 0.5
-*SET, dislocationRPower, 1
+*SET, dislocationRPower, 4
 *SET, dislocationMainPower, 2
 *SET, BellOrStep, 0.5
 *SET, scaleFactor, 1
