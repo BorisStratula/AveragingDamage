@@ -89,10 +89,13 @@ listOfCentralNodes(amountOfAveragedGroups) = newCentralNode
 		*GET, hisY, NODE, memberNode, LOC, Y
 		*GET, hisZ, NODE, memberNode, LOC, Z
 		distance = sqrt((hisX - myX)**2 + (hisY - myY)**2 + (hisZ - myZ)**2)
-		*IF, distance, le, dislocationRadius, then
+		*IF, distance, le, dislocationRadius, or, doesBellGoThroughGrain, eq, 'yes', then
 			numberOfFriends = numberOfFriends + 1
 			listOfFriends(currentNode, numberOfFriends + 1) = memberNode
 			rij = distance/dislocationRadius
+			*IF, doesBellGoThroughGrain, eq, 'yes', then
+				rij = rij / 2
+			*ENDIF
 			listOfAlphaInf(currentNode, numberOfFriends + 1) = (1 - rij**dislocationRPower)**dislocationMainPower
 			alphaIntegral = alphaIntegral + listOfAlphaInf(currentNode, numberOfFriends + 1)
 		*ENDIF
@@ -105,9 +108,3 @@ listOfCentralNodes(amountOfAveragedGroups) = newCentralNode
 	listOfAlphaD(currentNode, 1) = numberOfFriends
 *ENDDO
 
-!*IF, GlobalStep, eq, 1, then
-!	*STATUS, listOfFriends, newCentralNode, newCentralNode
-!	*STATUS, listOfAlphaInf, newCentralNode, newCentralNode
-!	*STATUS, listOfAlphaD, newCentralNode, newCentralNode
-!	*STATUS, listOfAlphaD, newCentralNode, newCentralNode
-!*ENDIF
