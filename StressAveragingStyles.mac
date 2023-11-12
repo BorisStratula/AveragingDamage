@@ -78,3 +78,27 @@
 		sigmaVH_t(currentNode) = sigmaLH_t(currentNode)
 	*ENDDO
 *ENDIF
+
+*IF, StressAveragingStyle, eq, 'central', then	
+	currentNode = centralNode
+	sigmaLH_n_tilda(currentNode) = 0
+	sigmaLH_t_tilda(currentNode) = 0
+	*DO, memberOfGroup, 2, listOfFriends(currentNode, 1) + 1
+		memberNumber = listOfFriends(currentNode, memberOfGroup)
+		*DO, iterator2, 2, listOfFriends(memberNumber, 1) + 1
+			*IF, listOfFriends(memberNumber, iterator2), eq, currentNode, then
+				revertAlphaD = listOfAlphaD(memberNumber, iterator2)
+				*EXIT
+			*ENDIF
+		*ENDDO
+		sigmaLH_n_tilda(currentNode) = sigmaLH_n_tilda(currentNode) + sigmaLH_n(listOfFriends(currentNode, memberOfGroup))*revertAlphaD
+		sigmaLH_t_tilda(currentNode) = sigmaLH_t_tilda(currentNode) + sigmaLH_t(listOfFriends(currentNode, memberOfGroup))*revertAlphaD
+	*ENDDO	
+	*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
+		currentNode = listOfFriends(centralNode, currentGroupMember)
+		sigmaLH_n(currentNode) = sigmaLH_n_tilda(centralNode)
+		sigmaLH_t(currentNode) = sigmaLH_t_tilda(centralNode)
+		sigmaVH_n(currentNode) = sigmaLH_n(currentNode)
+		sigmaVH_t(currentNode) = sigmaLH_t(currentNode)
+	*ENDDO
+*ENDIF

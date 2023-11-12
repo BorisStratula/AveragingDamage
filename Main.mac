@@ -26,7 +26,7 @@
 !*SET, scaleFactor, ((dislocationRadius + 025e-6) / 2 / dislocationRadius)**0.5
 
 *SET, ResumePreviousCalculation, 'no'
-*SET, TotalSteps, 50000
+*SET, TotalSteps, 10
 *SET, CalcRegime, 'TakeOff'
 *SET, DesiredBulkStressRatio, 0.25
 *SET, DoYouWantToNormalize, 0
