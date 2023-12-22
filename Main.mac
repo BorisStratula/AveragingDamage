@@ -19,21 +19,21 @@
 *SET, line_b, (1 - psi_stretch*psi_twist - E_Fin) / (psi_twist - 1)
 *SET, dislocationRadius, 110e-6
 *SET, dislocationKillThreshold, 0.5
-*SET, dislocationRPower, 4
-*SET, dislocationMainPower, 2
+*SET, dislocationRPower, 1
+*SET, dislocationMainPower, 4
 *SET, BellOrStep, 0.5
 *SET, scaleFactor, 1
 !*SET, scaleFactor, ((dislocationRadius + 025e-6) / 2 / dislocationRadius)**0.5
 
 *SET, ResumePreviousCalculation, 'no'
-*SET, TotalSteps, 10
+*SET, TotalSteps, 50000
 *SET, CalcRegime, 'TakeOff'
 *SET, DesiredBulkStressRatio, 0.25
 *SET, DoYouWantToNormalize, 0
 *SET, CalculateAngleToDeadNode, 0
 *SET, DoAverageOfDamage, 'no'
 *SET, DoAverageOfStress, 'yes'
-*SET, StressAveragingStyle, 'step'
+*SET, StressAveragingStyle, 'reverseIndices'
 *SET, doesBellGoThroughGrain, 'no'
 
 *SET, PlaneShift, 0

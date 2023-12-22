@@ -102,3 +102,22 @@
 		sigmaVH_t(currentNode) = sigmaLH_t(currentNode)
 	*ENDDO
 *ENDIF
+
+*IF, StressAveragingStyle, eq, 'reverseIndices', then
+	currentNode = centralNode
+	sigmaLH_n_tilda(currentNode) = 0
+	sigmaLH_t_tilda(currentNode) = 0
+	*DO, memberOfGroup, 2, listOfFriends(currentNode, 1) + 1
+		nonRevertAlphaD = listOfAlphaD(centralNode, memberOfGroup)
+		memberNumber = listOfFriends(currentNode, memberOfGroup)
+		sigmaLH_n_tilda(currentNode) = sigmaLH_n_tilda(currentNode) + sigmaLH_n(memberNumber)*nonRevertAlphaD
+		sigmaLH_t_tilda(currentNode) = sigmaLH_t_tilda(currentNode) + sigmaLH_t(memberNumber)*nonRevertAlphaD
+	*ENDDO	
+	*DO, currentGroupMember, 2, listOfFriends(centralNode, 1) + 1
+		currentNode = listOfFriends(centralNode, currentGroupMember)
+		sigmaLH_n(currentNode) = sigmaLH_n_tilda(centralNode)
+		sigmaLH_t(currentNode) = sigmaLH_t_tilda(centralNode)
+		sigmaVH_n(currentNode) = sigmaLH_n(currentNode)
+		sigmaVH_t(currentNode) = sigmaLH_t(currentNode)
+	*ENDDO
+*ENDIF
