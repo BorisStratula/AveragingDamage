@@ -1,20 +1,29 @@
-APDL script to perform fatigue numerical estimations based on a fatigue damage theory.
+APDL script to perform numerical fatigue estimates based on a fatigue damage theory.
 
 ## General information
-A fatige damage theory from [1, 2] is implemented by the means of APDL script for Ansys. To get the consistent results regardless of the mesh size an averaging algorithm from [3] is implemented over the equivalent stress field.
+A fatigue damage theory from [1, 2] is implemented for Ansys using the APDL script. To obtain consistent results independent of the mesh size, an averaging algorithm from [3] is implemented over the equivalent stress field.
 
-## How to use
-The code is meant to be used in Ansys Workbench environment.
-The following steps are recommended to use it:
--. Copy all the script files to your local machine
--. Set the path to the script files, line 4 in Main.mac
--. Set desired amount of loading steps, line 29 in Main.mac
--. Set matherial properties, such as Yound modulus and fatigue limits, in Main.mac lines 47 and 63-65
--. Create a static structural project in Ansys Workbench
--. Add geometry and apply boundarie conditions
--. In static structural, right next to the boundarie conditions, insert 'commands' script and import Main.mac
--. Run solution using the GUI
--. Upon completeon, check the results in project_folder/project_folder_files/dp0/SYS/MECH/ , all the text data is stored in solve.out under the title 'debug info'
+## Usage
+The code is intended to be used in Ansys Workbench environment.
+The following steps are recommended to use the code:
+
+1. Copy all script files to your local machine
+
+2. Set the path to the script files, line 4 in Main.mac
+
+3. Set the desired number of load steps, line 29 in Main.mac
+
+4. Set material properties such as Young's modulus and fatigue limit, lines 47 and 63-65 in Main.mac
+
+5. Create a static structure project in Ansys Workbench
+
+6. Add geometry and apply boundary conditions
+
+7. In the static structure, right next to the boundary conditions, insert 'commands' script and import Main.mac
+
+8. Execute the solution using the GUI
+
+9. After completion, check the results in project_folder/project_folder_files/dp0/SYS/MECH/, all text data will be saved in solve.out under the title 'debug info'.
 
 ## References
 [1] https://link.springer.com/chapter/10.1007/978-981-33-4826-4_12
